@@ -1,0 +1,7 @@
+{
+  "type": "users",
+  "id": "test",
+  "attributes": {
+    "email": "test2@test.com"
+  }
+}

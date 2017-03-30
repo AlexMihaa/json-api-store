@@ -4,6 +4,22 @@ export class ResourceInstanceMetadata {
     private _isNew: boolean = true;
     private _fields: {[field: string]: {value: any, initial: any}} = {};
 
+    public static getMetadata(resource: {[key: string]: any}): ResourceInstanceMetadata {
+        if (!resource[METADATA_PROPERTY]) {
+            return null;
+        }
+
+        return resource[METADATA_PROPERTY];
+    }
+
+    public static flushMetadata(resource: {[key: string]: any}) {
+        if (!resource[METADATA_PROPERTY]) {
+            return;
+        }
+
+        (<ResourceInstanceMetadata>resource[METADATA_PROPERTY]).flush();
+    }
+
     get isNew(): boolean {
         return this._isNew;
     }
@@ -68,11 +84,11 @@ export class ResourceInstanceMetadata {
             }
 
             if (ResourceInstanceMetadata.isResource(this._fields[field].initial)) {
-                ResourceInstanceMetadata.flushInstanceMetadata(this._fields[field].initial);
+                ResourceInstanceMetadata.flushMetadata(this._fields[field].initial);
             } else if (this._fields[field].initial instanceof Array) {
                 this._fields[field].initial.forEach((cur: any) => {
                     if (ResourceInstanceMetadata.isResource(cur)) {
-                        ResourceInstanceMetadata.flushInstanceMetadata(cur);
+                        ResourceInstanceMetadata.flushMetadata(cur);
                     }
                 });
             }
@@ -114,13 +130,5 @@ export class ResourceInstanceMetadata {
         }
 
         return (<ResourceInstanceMetadata>value[METADATA_PROPERTY]).hasChanges;
-    }
-
-    private static flushInstanceMetadata(resource: {[key: string]: any}) {
-        if (!resource[METADATA_PROPERTY]) {
-            return;
-        }
-
-        (<ResourceInstanceMetadata>resource[METADATA_PROPERTY]).flush();
     }
 }

@@ -1,0 +1,24 @@
+{
+  "type": "users",
+  "attributes": {
+    "email": "test@test.com",
+    "name": "Test User"
+  },
+  "relationships": {
+    "office": {
+      "data": {
+        "type": "offices",
+        "attributes": {
+          "title": "Test office",
+          "address": "Test address"
+        }
+      }
+    },
+    "roles": {
+      "data": [
+        {"type": "user-roles", "attributes": {"role": "advertiser", "status": "activation"}},
+        {"type": "user-roles", "attributes": {"role": "publisher", "status": "activation"}}
+      ]
+    }
+  }
+}

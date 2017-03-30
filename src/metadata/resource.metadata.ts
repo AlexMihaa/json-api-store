@@ -1,10 +1,15 @@
 import { AttributeMetadata } from './attribute.metadata';
 import { RelationshipMetadata } from './relationship.metadata';
+import { METADATA_KEY } from '../decorators/resource.decorator';
 
 export class ResourceMetadata {
     public type: string;
     private attributes: AttributeMetadata[] = [];
     private relationships: RelationshipMetadata[] = [];
+
+    public static getClassMetadata(constructor: Function): ResourceMetadata {
+        return (<any>Reflect).getOwnMetadata(METADATA_KEY, constructor);
+    }
 
     addAttributes(attributes: AttributeMetadata[]): ResourceMetadata {
         attributes.forEach((attribute) => {

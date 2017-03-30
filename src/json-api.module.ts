@@ -1,7 +1,13 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
+import { HttpModule } from '@angular/http';
+
 import { JsonApiStore } from './json-api.store';
 
-@NgModule({})
+@NgModule({
+    imports: [
+        HttpModule
+    ]
+})
 export class JsonApiModule {
 
     public static forRoot(): ModuleWithProviders {

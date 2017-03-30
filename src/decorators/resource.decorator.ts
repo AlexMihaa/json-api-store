@@ -1,7 +1,7 @@
 import { ResourceConfig } from './resource.config';
 import { ResourceMetadata } from '../metadata/resource.metadata';
 
-export const METADATA_KEY = 'JsonApiResource';
+export const METADATA_KEY = 'JsonApiModel';
 export const METADATA_PROPERTY = '__apiMetadata';
 
 export function Resource(config?: ResourceConfig): ClassDecorator {
