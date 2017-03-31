@@ -1,9 +1,9 @@
-import { Resource } from '../../src/decorators/resource.decorator';
+import { Model } from '../../src/decorators/model';
 import { JsonApiModel } from '../../src/json-api.model';
-import { Attribute } from '../../src/decorators/attribute.decorator';
+import { Attribute } from '../../src/decorators/attribute';
 import { User } from './user.model';
 
-@Resource({type: 'user-roles'})
+@Model({type: 'user-roles'})
 export class UserRole extends JsonApiModel {
 
     @Attribute()

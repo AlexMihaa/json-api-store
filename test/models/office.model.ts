@@ -1,8 +1,8 @@
 import { JsonApiModel } from '../../src/json-api.model';
-import { Resource } from '../../src/decorators/resource.decorator';
-import { Attribute } from '../../src/decorators/attribute.decorator';
+import { Model } from '../../src/decorators/model';
+import { Attribute } from '../../src/decorators/attribute';
 
-@Resource({type: 'offices'})
+@Model({type: 'offices'})
 export class Office extends JsonApiModel {
 
     @Attribute()

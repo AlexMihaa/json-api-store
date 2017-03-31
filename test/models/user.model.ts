@@ -1,11 +1,11 @@
-import { Resource } from '../../src/decorators/resource.decorator';
-import { Attribute } from '../../src/decorators/attribute.decorator';
+import { Model } from '../../src/decorators/model';
+import { Attribute } from '../../src/decorators/attribute';
 import { JsonApiModel } from '../../src/json-api.model';
 import { UserRole } from './user-role.model';
-import { Relationship } from '../../src/decorators/relationship.decorator';
+import { Relationship } from '../../src/decorators/relationship';
 import { Office } from './office.model';
 
-@Resource({type: 'users'})
+@Model({type: 'users'})
 export class User extends JsonApiModel {
 
     @Attribute()

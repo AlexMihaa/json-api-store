@@ -1,9 +1,9 @@
 import { JsonApiModel } from '../../src/json-api.model';
 import { User } from './user.model';
-import { Relationship } from '../../src/decorators/relationship.decorator';
-import { Resource } from '../../src/decorators/resource.decorator';
+import { Relationship } from '../../src/decorators/relationship';
+import { Model } from '../../src/decorators/model';
 
-@Resource({type: 'posts'})
+@Model({type: 'posts'})
 export class Post extends JsonApiModel {
 
     @Relationship({resource: User})

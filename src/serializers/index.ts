@@ -1,4 +1,3 @@
-export * from './attribute.serializer';
-export * from './resource.serializer';
-export * from './serialization.context';
-export * from './document.serializer';
+export * from './resource';
+export * from './context';
+export * from './document';

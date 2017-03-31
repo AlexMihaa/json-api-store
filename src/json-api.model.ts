@@ -1,6 +1,6 @@
-import { Model } from './contracts';
+import { Resource } from './contracts';
 
-export class JsonApiModel implements Model {
+export class JsonApiModel implements Resource {
 
     /**
      * Resource ID

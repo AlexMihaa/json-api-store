@@ -1,10 +1,9 @@
-import { User } from './user.model';
-import { Resource } from '../../src/decorators/resource.decorator';
-import { Permission } from './permission.model';
-import { Relationship } from '../../src/decorators/relationship.decorator';
-import { Attribute } from '../../src/decorators/attribute.decorator';
+import { Model, Attribute, Relationship } from '../../src';
 
-@Resource()
+import { User } from './user.model';
+import { Permission } from './permission.model';
+
+@Model()
 export class Administrator extends User {
 
     @Attribute({field: 'public'})
