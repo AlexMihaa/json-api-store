@@ -14,7 +14,7 @@ import { ModelType } from '../contracts/model.type';
 @Injectable()
 export class JsonApiResourceSerializer {
 
-    serialize(resource: Model, metadata: ResourceMetadata): JsonApiResource {
+    serialize<T extends Model>(resource: T, metadata: ResourceMetadata): JsonApiResource {
         const payload: JsonApiResource = {
             type: metadata.type
         };
@@ -36,11 +36,8 @@ export class JsonApiResourceSerializer {
         return payload;
     }
 
-    serializeAsId(resource: Model, metadata: ResourceMetadata): JsonApiResourceIdentifier {
-        return {
-            id: resource.id,
-            type: metadata.type
-        };
+    serializeAsId<T extends Model>(resource: T, metadata: ResourceMetadata): JsonApiResourceIdentifier {
+        return (resource) ? {id: resource.id, type: metadata.type} : null;
     }
 
     deserialize<T extends Model>(

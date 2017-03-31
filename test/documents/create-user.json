@@ -1,0 +1,13 @@
+{
+  "data": {
+    "type": "users",
+    "attributes": {
+      "email": "test@test.com",
+      "name": "Test user"
+    },
+    "relationships": {
+      "office": {"data": null},
+      "roles": {"data": []}
+    }
+  }
+}

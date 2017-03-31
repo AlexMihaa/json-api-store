@@ -1,14 +1,26 @@
 import { AttributeMetadata } from './attribute.metadata';
 import { RelationshipMetadata } from './relationship.metadata';
 import { METADATA_KEY } from '../decorators/resource.decorator';
+import { ModelType } from '../contracts/model.type';
+import { Model } from '../contracts/model.interface';
 
 export class ResourceMetadata {
     public type: string;
     private attributes: AttributeMetadata[] = [];
     private relationships: RelationshipMetadata[] = [];
 
-    public static getClassMetadata(constructor: Function): ResourceMetadata {
-        return (<any>Reflect).getOwnMetadata(METADATA_KEY, constructor);
+    public static getClassMetadata<T extends Model>(modelType: ModelType<T>): ResourceMetadata {
+        return (<any>Reflect).getOwnMetadata(METADATA_KEY, modelType);
+    }
+
+    public static getObjectMetadata<T extends Model>(object: T|T[]): ResourceMetadata {
+        if (Array.isArray(object)) {
+            object = object[0];
+        }
+
+        const modelType = Object.getPrototypeOf(object).constructor;
+
+        return ResourceMetadata.getClassMetadata(modelType);
     }
 
     addAttributes(attributes: AttributeMetadata[]): ResourceMetadata {

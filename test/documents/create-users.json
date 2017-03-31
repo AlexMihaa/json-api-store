@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "type": "users",
+      "attributes": {
+        "email": "test1@test.com",
+        "name": "Test user 1"
+      },
+      "relationships": {
+        "office": {"data": null},
+        "roles": {"data": []}
+      }
+    },
+    {
+      "type": "users",
+      "attributes": {
+        "email": "test2@test.com",
+        "name": "Test user 2"
+      },
+      "relationships": {
+        "office": {"data": null},
+        "roles": {"data": []}
+      }
+    }
+  ]
+}
