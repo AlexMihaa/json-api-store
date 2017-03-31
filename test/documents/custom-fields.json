@@ -1,0 +1,12 @@
+{
+  "data": {
+    "type": "custom-fields-resources",
+    "id": "test",
+    "attributes": {
+      "name": "test"
+    },
+    "relationships": {
+      "user": {"data": {"type": "users", "id": "test"}}
+    }
+  }
+}

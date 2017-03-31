@@ -1,0 +1,10 @@
+{
+  "type": "custom-fields-resources",
+  "attributes": {
+    "name": "test"
+  },
+  "relationships": {
+    "user": {"data": {"type": "users", "id": "test"}},
+    "offices": {"data": []}
+  }
+}

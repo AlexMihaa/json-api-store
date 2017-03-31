@@ -1,0 +1,12 @@
+{
+  "data": {
+    "id": "1",
+    "type": "users",
+    "attributes": {
+      "email": "test@test.com"
+    },
+    "relationships": {
+      "roles": {"data": [{"type": "user-roles", "id": "1-advertiser"}, {"type": "user-roles", "id": "1-publisher"}]}
+    }
+  }
+}

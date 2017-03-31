@@ -1,4 +1,4 @@
-import { JsonApiResourceIdentifier } from './resource-identifier';
+import { JsonApiResourceIdentifier } from './resource-identifier.interface';
 
 export interface JsonApiResource {
     id?: string;

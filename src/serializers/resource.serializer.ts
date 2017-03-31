@@ -2,16 +2,19 @@ import { Injectable } from '@angular/core';
 
 import { ResourceMetadata } from '../metadata/resource.metadata';
 import { ResourceInstanceMetadata } from '../metadata/resource-instance.metadata';
-import { JsonApiResource } from '../contracts/resource';
+import { JsonApiResource } from '../contracts/resource.interface';
 import { AttributeMetadata } from '../metadata/attribute.metadata';
-import { JsonApiResourceIdentifier } from '../contracts/resource-identifier';
+import { JsonApiResourceIdentifier } from '../contracts/resource-identifier.interface';
 import { RelationshipMetadata } from '../metadata/relationship.metadata';
-import { JsonApiRelationship } from '../contracts/relationship';
+import { JsonApiRelationship } from '../contracts/relationship.interface';
+import { JsonApiSerializationContext } from './serialization.context';
+import { Model } from '../contracts/model.interface';
+import { ModelType } from '../contracts/model.type';
 
 @Injectable()
 export class JsonApiResourceSerializer {
 
-    serialize(resource: any, metadata: ResourceMetadata): JsonApiResource {
+    serialize(resource: Model, metadata: ResourceMetadata): JsonApiResource {
         const payload: JsonApiResource = {
             type: metadata.type
         };
@@ -33,14 +36,38 @@ export class JsonApiResourceSerializer {
         return payload;
     }
 
-    serializeAsId(resource: any, metadata: ResourceMetadata): JsonApiResourceIdentifier {
+    serializeAsId(resource: Model, metadata: ResourceMetadata): JsonApiResourceIdentifier {
         return {
             id: resource.id,
             type: metadata.type
         };
     }
 
-    private serializeAttributes(resource: any, metadata: ResourceMetadata): {[key: string]: any} {
+    deserialize<T extends Model>(
+        data: JsonApiResource,
+        modelType: ModelType<T>,
+        context: JsonApiSerializationContext
+    ): T {
+        const metadata = ResourceMetadata.getClassMetadata(modelType);
+
+        const resource = new modelType();
+        resource.id = data.id;
+
+        if (data.attributes && data.attributes instanceof Object) {
+            this.deserializeAttributes(resource, data.attributes, metadata);
+        }
+
+        if (data.relationships && data.relationships instanceof Object) {
+            this.deserializeRelationships(resource, data.relationships, metadata, context);
+        }
+
+        ResourceInstanceMetadata.flushMetadata(resource);
+        context.addResource(metadata.type, resource.id, resource);
+
+        return resource;
+    }
+
+    private serializeAttributes(resource: Model, metadata: ResourceMetadata): {[key: string]: any} {
         let count:number = 0;
         const attributes: {[key: string]: any} = {};
 
@@ -54,7 +81,7 @@ export class JsonApiResourceSerializer {
                 return;
             }
 
-            let value = (instMetadata) ? instMetadata.getFieldValue(attrMetadata.property) : undefined;
+            let value = instMetadata.getFieldValue(attrMetadata.property);
             if (attrMetadata.serializer) {
                 value = attrMetadata.serializer.serialize(value);
             } else if (typeof value === 'undefined') {
@@ -71,7 +98,7 @@ export class JsonApiResourceSerializer {
         return (count > 0) ? attributes : null;
     }
 
-    private serializeRelationships(resource: any, metadata: ResourceMetadata): any {
+    private serializeRelationships(resource: Model, metadata: ResourceMetadata): any {
         let count: number = 0;
         const relationships: {[key: string]: JsonApiRelationship} = {};
 
@@ -102,7 +129,7 @@ export class JsonApiResourceSerializer {
             return null;
         }
 
-        const value = (instMeta) ? instMeta.getFieldValue(relMeta.property) : undefined;
+        const value = instMeta.getFieldValue(relMeta.property);
         const metadata = ResourceMetadata.getClassMetadata(relMeta.resource);
 
         if (relMeta.isArray) {
@@ -138,12 +165,91 @@ export class JsonApiResourceSerializer {
         return relationship;
     }
 
-    private serializeRelationshipItem(item: any, metadata: ResourceMetadata): JsonApiResource|JsonApiResourceIdentifier {
+    private serializeRelationshipItem(item: Model, metadata: ResourceMetadata): JsonApiResource|JsonApiResourceIdentifier {
         const instMeta = ResourceInstanceMetadata.getMetadata(item);
         if ((!instMeta) || (false === instMeta.isNew) || (false === instMeta.hasChanges)) {
             return this.serializeAsId(item, metadata);
         }
 
         return this.serialize(item, metadata);
+    }
+
+    private deserializeAttributes(resource: any, data: any, metadata: ResourceMetadata) {
+        metadata.getAttributes().forEach((attrMeta: AttributeMetadata) => {
+            const field = (attrMeta.field) ? attrMeta.field : attrMeta.property;
+            if (!data[field]) {
+                return;
+            }
+
+            resource[attrMeta.property] = (attrMeta.serializer) ? attrMeta.serializer.unserialize(data[field]) : data[field];
+        });
+    }
+
+    private deserializeRelationships(
+        resource: any,
+        data: any,
+        metadata: ResourceMetadata,
+        context: JsonApiSerializationContext
+    ) {
+        metadata.getRelationships().forEach((relMeta: RelationshipMetadata) => {
+            const field = (relMeta.field) ? relMeta.field : relMeta.property;
+            if (!data[field]) {
+                return;
+            }
+
+            let parsedValue: Model|Model[];
+            if (relMeta.isArray) {
+                parsedValue = this.deserializeRelationshipItems(data[field].data, relMeta.resource, context);
+            } else {
+                parsedValue = this.deserializeRelationshipItem(data[field].data, relMeta.resource, context);
+            }
+
+            resource[relMeta.property] = parsedValue;
+        });
+    }
+
+    private deserializeRelationshipItems<T extends Model>(
+        value: Array<JsonApiResourceIdentifier>,
+        modelType: ModelType<T>,
+        context: JsonApiSerializationContext
+    ): T[] {
+        const parsed: Array<T> = [];
+
+        if (!Array.isArray(value)) {
+            return parsed;
+        }
+
+        value.forEach((item: JsonApiResourceIdentifier) => {
+            const parsedItem = this.deserializeRelationshipItem(item, modelType, context);
+            if (!parsedItem) {
+                return;
+            }
+
+            parsed.push(parsedItem);
+        });
+
+        return parsed;
+    }
+
+    private deserializeRelationshipItem<T extends Model>(
+        data: JsonApiResourceIdentifier,
+        modelType: ModelType<T>,
+        context: JsonApiSerializationContext
+    ) {
+        if (!data || (!data.type) || (!data.id)) {
+            return null;
+        }
+
+        if (context.hasResource(data.type, data.id)) {
+            return context.getResource(data.type, data.id);
+        }
+
+        if (context.hasLinkedData(data.type, data.id)) {
+            this.deserialize(context.getLinkedData(data.type, data.id), modelType, context);
+        } else {
+            this.deserialize(data, modelType, context);
+        }
+
+        return context.getResource(data.type, data.id);
     }
 }

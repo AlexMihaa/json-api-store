@@ -1,0 +1,12 @@
+{
+  "data": {
+    "type": "corrupted",
+    "id": "test",
+    "relationships": {
+      "owner": "corrupted",
+      "admin": {"data": "corrupted"},
+      "offices": {"data": "corrupted"},
+      "permissions": {"data": ["corrupted"]}
+    }
+  }
+}

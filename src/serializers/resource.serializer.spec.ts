@@ -3,10 +3,15 @@ import { JsonApiResourceSerializer } from './resource.serializer';
 import { ResourceMetadata } from '../metadata/resource.metadata';
 import { User } from '../../test/models/user.model';
 import { UserRole } from '../../test/models/user-role.model';
+import { CustomFieldsResource } from '../../test/models/custom-fields.model';
 import { ResourceInstanceMetadata } from '../metadata/resource-instance.metadata';
 
-import { Resource, Attribute, Relationship } from '../decorators';
-import { JsonApiResource } from '../contracts/resource';
+import { JsonApiResource } from '../contracts/resource.interface';
+import { JsonApiDocument } from '../contracts/document.interface';
+import { JsonApiSerializationContext } from './serialization.context';
+import { CustomAttributeResource } from '../../test/models/custom-attribute.model';
+import { CorruptedResource } from '../../test/models/corrupted.model';
+import { Post } from '../../test/models/post.model';
 
 describe('JsonApiResourceSerializer', () => {
     const metadata = ResourceMetadata.getClassMetadata(User);
@@ -86,7 +91,7 @@ describe('JsonApiResourceSerializer', () => {
         expect(payload).toEqual(expected);
     });
 
-    it('should serialize resources existing relationships', () => {
+    it('should serialize resources with existing relationships', () => {
         const office = new Office();
         office.id = 'test';
         ResourceInstanceMetadata.flushMetadata(office);
@@ -102,56 +107,145 @@ describe('JsonApiResourceSerializer', () => {
     });
 
     it('should serialize resources with custom attribute serializers', () => {
-        const attrSerializer: any = jasmine.createSpyObj('attrSerializer', ['serialize']);
-        attrSerializer.serialize.and.returnValue('test');
+        const modelMetadata = ResourceMetadata.getClassMetadata(CustomAttributeResource);
+        const attrSerializer = modelMetadata.getAttribute('name').serializer;
 
-        @Resource({type: 'custom-attributes'})
-        class CustomAttributeResource {
+        spyOn(attrSerializer, 'serialize').and.callThrough();
 
-            @Attribute({serializer: attrSerializer})
-            name: string;
-        }
+        const resource = new CustomAttributeResource();
+        resource.name = 'TEST';
 
-        const obj = new CustomAttributeResource();
-        obj.name = 'custom';
+        const payload = serializer.serialize(resource, modelMetadata);
 
-        const resource: JsonApiResource = serializer.serialize(
-            obj,
-            ResourceMetadata.getClassMetadata(CustomAttributeResource)
-        );
+        expect(attrSerializer.serialize).toHaveBeenCalledWith(resource.name);
 
-        expect(attrSerializer.serialize).toHaveBeenCalledWith('custom');
-        expect(resource.attributes.name).toEqual('test');
+        const expected = require('../../test/payloads/custom-attribute.json');
+
+        expect(payload).toEqual(expected);
     });
 
     it('should serialize resources with custom field name', () => {
-        @Resource({type: 'related-resources'})
-        class RelatedResource {
-
-        }
-
-        @Resource({type: 'custom-fields-resource'})
-        class CustomFieldsResource {
-            @Attribute({field: 'title'})
-            name: string;
-
-            @Relationship({resource: RelatedResource, isArray: true, field: 'custom'})
-            related: RelatedResource[];
-        }
+        user.id = 'test';
+        ResourceInstanceMetadata.flushMetadata(user);
 
         const obj = new CustomFieldsResource();
-        const resource: JsonApiResource = serializer.serialize(
+        obj.title = 'test';
+        obj.customer = user;
+
+        const payload: JsonApiResource = serializer.serialize(
             obj,
             ResourceMetadata.getClassMetadata(CustomFieldsResource)
         );
 
-        expect(resource.attributes).toBeDefined();
-        expect(resource.attributes.name).toBeUndefined();
-        expect(resource.attributes.title).toBeNull();
+        const expected = require('../../test/payloads/custom-fields.json');
 
-        expect(resource.relationships).toBeDefined();
-        expect(resource.relationships.related).toBeUndefined();
-        expect(resource.relationships.custom).toBeDefined();
-        expect(resource.relationships.custom.data).toEqual([]);
+        expect(payload).toEqual(expected);
+    });
+
+    it('should deserialize resource', () => {
+        const doc: JsonApiDocument = require('../../test/documents/user.json');
+        const context = new JsonApiSerializationContext(doc.included);
+
+        const parsed = serializer.deserialize(<JsonApiResource>doc.data, User, context);
+
+        expect(parsed instanceof User).toBeTruthy();
+        expect(parsed.id).toEqual("1");
+        expect(parsed.email).toEqual("test@test.com");
+        expect(parsed.name).toEqual("Test User");
+
+        expect(parsed.office instanceof Office).toBeTruthy();
+        const office: Office = parsed.office;
+        expect(office.id).toEqual("1");
+        expect(office.title).toEqual("Test office");
+        expect(office.address).toEqual("Test address");
+
+        expect(Array.isArray(parsed.roles)).toBeTruthy();
+        expect(parsed.roles.length).toEqual(2);
+
+        parsed.roles.forEach((userRole: UserRole) => {
+            expect(userRole instanceof UserRole).toBeTruthy();
+            expect(userRole.status).toEqual('active');
+
+            const expectedRole = ('1-advertiser' === userRole.id) ? 'advertiser' : 'publisher';
+            expect(userRole.role).toEqual(expectedRole);
+        });
+    });
+
+    it('should deserialize resource with sparse fieldset', () => {
+        const doc: JsonApiDocument = require('../../test/documents/user-sparse-fieldset.json');
+        const context = new JsonApiSerializationContext(doc.included);
+
+        const parsed = serializer.deserialize(<JsonApiResource>doc.data, User, context);
+
+        expect(parsed instanceof User).toBeTruthy();
+        expect(parsed.id).toEqual("1");
+        expect(parsed.email).toEqual("test@test.com");
+        expect(parsed.name).toBeUndefined();
+
+        expect(parsed.office).toBeNull();
+
+        expect(Array.isArray(parsed.roles)).toBeTruthy();
+        expect(parsed.roles.length).toEqual(2);
+
+        parsed.roles.forEach((userRole: UserRole) => {
+            expect(userRole instanceof UserRole).toBeTruthy();
+        });
+    });
+
+    it('should deserialize resources with custom field name', () => {
+        const doc: JsonApiDocument = require('../../test/documents/custom-fields.json');
+        const context = new JsonApiSerializationContext(doc.included);
+
+        const parsed = serializer.deserialize(<JsonApiResource>doc.data, CustomFieldsResource, context);
+
+        expect(parsed instanceof CustomFieldsResource).toBeTruthy();
+        expect(parsed.id).toEqual('test');
+        expect(parsed.title).toEqual('test');
+        expect(parsed.customer instanceof User).toBeTruthy();
+        expect(parsed.customer.id).toEqual('test');
+    });
+
+    it('should deserialize resources with custom attribute serializers', () => {
+        const modelMetadata = ResourceMetadata.getClassMetadata(CustomAttributeResource);
+        const attrSerializer = modelMetadata.getAttribute('name').serializer;
+
+        spyOn(attrSerializer, 'unserialize').and.callThrough();
+
+        const doc: JsonApiDocument = require('../../test/documents/custom-attribute.json');
+        const context = new JsonApiSerializationContext(doc.included);
+
+        const parsed = serializer.deserialize(<JsonApiResource>doc.data, CustomAttributeResource, context);
+
+        expect(attrSerializer.unserialize).toHaveBeenCalledWith('test');
+
+        expect(parsed instanceof CustomAttributeResource).toBeTruthy();
+        expect(parsed.id).toEqual('1');
+        expect(parsed.name).toEqual('TEST');
+    });
+
+    it('should deserialize resources with corrupted relationships', () => {
+        const doc: JsonApiDocument = require('../../test/documents/corrupted.json');
+        const context = new JsonApiSerializationContext(doc.included);
+
+        const parsed = serializer.deserialize(<JsonApiResource>doc.data, CorruptedResource, context);
+
+        expect(parsed instanceof CorruptedResource).toBeTruthy();
+        expect(parsed.id).toEqual('test');
+        expect(parsed.owner).toBeNull();
+        expect(parsed.admin).toBeNull();
+        expect(parsed.offices).toEqual([]);
+        expect(parsed.permissions).toEqual([]);
+    });
+
+    it('should deserialize resource and reuse the same objects for relationships', () => {
+        const doc: JsonApiDocument = require('../../test/documents/post.json');
+        const context = new JsonApiSerializationContext(doc.included);
+
+        const parsed = serializer.deserialize(<JsonApiResource>doc.data, Post, context);
+
+        expect(parsed instanceof Post).toBeTruthy();
+        expect(parsed.author instanceof User).toBeTruthy();
+        expect(parsed.moderator instanceof User).toBeTruthy();
+        expect(parsed.author).toBe(parsed.moderator);
     });
 });
