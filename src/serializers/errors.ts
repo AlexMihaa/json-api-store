@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ApiError } from '../contracts/api/error';
+
+import { ApiError } from '../contracts';
 
 @Injectable()
-export class JsonApiErrorSerializer {
+export class JsonApiErrorsSerializer {
 
     deserialize(data: ApiError) {
 

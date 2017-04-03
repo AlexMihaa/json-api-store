@@ -1,7 +1,4 @@
-import { JsonApiModel } from '../../src/json-api.model';
-import { Model } from '../../src/decorators/model';
-import { AttributeSerializer } from '../../src/contracts/serializers/attribute';
-import { Attribute } from '../../src/decorators/attribute';
+import { JsonApiResource, Model, Attribute, AttributeSerializer } from '../../src';
 
 export class NameSerializer implements AttributeSerializer {
     serialize(value: any): any {
@@ -14,7 +11,7 @@ export class NameSerializer implements AttributeSerializer {
 }
 
 @Model({type: 'custom-attributes'})
-export class CustomAttributeResource extends JsonApiModel {
+export class CustomAttributeResource extends JsonApiResource {
 
     @Attribute({serializer: new NameSerializer()})
     name: string;

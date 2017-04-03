@@ -1,13 +1,12 @@
-import { JsonApiModel } from '../../src/json-api.model';
-import { Model } from '../../src/decorators/model';
+import { JsonApiResource, Model, Relationship } from '../../src';
+
 import { User } from './user.model';
-import { Relationship } from '../../src/decorators/relationship';
 import { Administrator } from './administrator.model';
 import { Office } from './office.model';
 import { Permission } from './permission.model';
 
 @Model({type: 'corrupted'})
-export class CorruptedResource extends JsonApiModel {
+export class CorruptedResource extends JsonApiResource {
 
     @Relationship({resource: User})
     owner: User;

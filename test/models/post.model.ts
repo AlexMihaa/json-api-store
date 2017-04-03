@@ -1,10 +1,9 @@
-import { JsonApiModel } from '../../src/json-api.model';
+import { JsonApiResource, Model, Relationship } from '../../src';
+
 import { User } from './user.model';
-import { Relationship } from '../../src/decorators/relationship';
-import { Model } from '../../src/decorators/model';
 
 @Model({type: 'posts'})
-export class Post extends JsonApiModel {
+export class Post extends JsonApiResource {
 
     @Relationship({resource: User})
     author: User;

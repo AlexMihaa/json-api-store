@@ -1,12 +1,10 @@
-import { Model } from '../../src/decorators/model';
+import { JsonApiResource, Model, Relationship, Attribute } from '../../src';
+
 import { User } from './user.model';
-import { Relationship } from '../../src/decorators/relationship';
-import { Attribute } from '../../src/decorators/attribute';
-import { JsonApiModel } from '../../src/json-api.model';
 import { Office } from './office.model';
 
 @Model({type: 'custom-fields-resources'})
-export class CustomFieldsResource extends JsonApiModel {
+export class CustomFieldsResource extends JsonApiResource {
     @Attribute({field: 'name'})
     title: string;
 

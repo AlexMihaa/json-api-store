@@ -1,7 +1,7 @@
 import { ModelConfiguration } from '../contracts/configuration/model';
 import { ModelMetadata } from '../metadata/model';
 
-export const METADATA_KEY = 'JsonApiModel';
+export const METADATA_KEY = 'JsonApiResource';
 export const METADATA_PROPERTY = '__apiMetadata';
 
 export function Model(config?: ModelConfiguration): ClassDecorator {

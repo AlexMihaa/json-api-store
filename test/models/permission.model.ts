@@ -1,9 +1,7 @@
-import { JsonApiModel } from '../../src/json-api.model';
-import { Attribute } from '../../src/decorators/attribute';
-import { Model } from '../../src/decorators/model';
+import { JsonApiResource, Model, Attribute } from '../../src';
 
 @Model({type: 'permissions'})
-export class Permission extends JsonApiModel {
+export class Permission extends JsonApiResource {
 
     @Attribute()
     name: string;
