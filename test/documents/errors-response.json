@@ -1,0 +1,9 @@
+{
+  "errors": [
+    {
+      "id": "test1",
+      "status": "422",
+      "code": "test-error"
+    }
+  ]
+}

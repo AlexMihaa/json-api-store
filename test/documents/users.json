@@ -1,0 +1,57 @@
+{
+  "data": [
+    {
+      "id": "1",
+      "type": "users",
+      "attributes": {
+        "email": "test@test.com",
+        "name": "Test User"
+      },
+      "relationships": {
+        "office": {"data": {"type": "offices", "id": "1"}},
+        "roles": {"data": [{"type": "user-roles", "id": "1-advertiser"}, {"type": "user-roles", "id": "1-publisher"}]}
+      }
+    },
+    {
+      "id": "2",
+      "type": "users",
+      "attributes": {
+        "email": "test2@test.com",
+        "name": "Test User 2"
+      },
+      "relationships": {
+        "office": {"data": {"type": "offices", "id": "1"}},
+        "roles": {"data": [{"type": "user-roles", "id": "2-advertiser"}]}
+      }
+    }
+  ],
+  "included": [
+    {
+      "id": "1",
+      "type": "offices",
+      "attributes": {
+        "title": "Test office",
+        "address": "Test address"
+      }
+    },
+    {
+      "id": "1-advertiser",
+      "type": "user-roles",
+      "attributes": {
+        "role": "advertiser",
+        "status": "active"
+      }
+    },
+    {
+      "id": "1-publisher",
+      "type": "user-roles",
+      "attributes": {
+        "role": "publisher",
+        "status": "active"
+      }
+    }
+  ],
+  "meta": {
+    "test": "test metadata"
+  }
+}

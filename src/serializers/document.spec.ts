@@ -2,6 +2,10 @@ import { JsonApiResourceSerializer } from './resource';
 import { JsonApiDocumentSerializer } from './document';
 import { User } from '../../test/models/user.model';
 import { ModelMetadata } from '../metadata/model';
+import { ApiDocument } from '../contracts/api/document';
+import { JsonApiDocument } from '../models/document';
+import { SerializationContext } from './context';
+import { ApiResource } from '../contracts/api/resource';
 
 describe('JsonApiDocumentSerializer', () => {
 
@@ -52,5 +56,71 @@ describe('JsonApiDocumentSerializer', () => {
         const expected = require('../../test/documents/create-users.json');
 
         expect(doc).toEqual(expected);
+    });
+
+    it('should deserialize response with single resource', () => {
+        const data: ApiDocument = require('../../test/documents/user.json');
+        const user = new User();
+
+        spyOn(resSerializer, 'deserialize').and.callFake((item: any, resType: any, context: any) => {
+            expect(item).toEqual(data.data);
+            expect(resType).toEqual(User);
+            expect(context instanceof SerializationContext).toBeTruthy();
+
+            return user;
+        });
+
+        const doc = docSerializer.deserialize(data, User);
+
+        expect(resSerializer.deserialize).toHaveBeenCalled();
+
+        expect(doc instanceof JsonApiDocument).toBeTruthy();
+        expect(doc.data).toEqual(user);
+    });
+
+    it('should deserialize response with several resources', () => {
+        const data: ApiDocument = require('../../test/documents/users.json');
+        const user1 = new User();
+        const user2 = new User();
+
+        let pass = 0;
+
+        spyOn(resSerializer, 'deserialize').and.callFake((item: any, resType: any, context: any) => {
+            pass++;
+
+            const responseData: ApiResource[] = <ApiResource[]>data.data;
+            const expectedItem: ApiResource = (1 === pass) ? responseData[0] : responseData[1];
+            expect(item).toEqual(expectedItem);
+
+            expect(resType).toEqual(User);
+            expect(context instanceof SerializationContext).toBeTruthy();
+
+            return (1 === pass) ? user1 : user2;
+        });
+
+        const doc = docSerializer.deserialize(data, User);
+
+        expect(resSerializer.deserialize).toHaveBeenCalledTimes(2);
+
+        expect(doc instanceof JsonApiDocument).toBeTruthy();
+
+        const docData: User[] = <User[]>doc.data;
+        expect(Array.isArray(docData)).toBeTruthy();
+        expect(docData[0]).toEqual(user1);
+        expect(docData[1]).toEqual(user2);
+
+        expect(doc.meta).toEqual(data.meta);
+    });
+
+    it('should deserialize response with errors', () => {
+        spyOn(resSerializer, 'deserialize');
+
+        const data: ApiDocument = require('../../test/documents/errors-response.json');
+
+        const doc = docSerializer.deserialize(data, User);
+
+        expect((<any>resSerializer.deserialize).calls.count()).toEqual(0);
+        expect(doc instanceof JsonApiDocument).toBeTruthy();
+        expect(doc.errors).toEqual(data.errors);
     });
 });
