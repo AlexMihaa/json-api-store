@@ -1,0 +1,29 @@
+import { Resource, ResourceType } from '../contracts';
+import { Inject, Injectable, InjectionToken } from '@angular/core';
+import { ModelMetadata } from '../metadata/model';
+
+export let JSON_API_BASE_URL = new InjectionToken<string>('json_api.base_url');
+
+@Injectable()
+export class JsonApiUrlBuilder {
+
+    private baseUrl: string;
+
+    constructor(@Inject(JSON_API_BASE_URL) baseUrl: string) {
+        this.baseUrl = baseUrl;
+    }
+
+    getResourceUrl<T extends Resource>(resType: ResourceType<T>, id: string): string {
+        return this.getResourceListUrl(resType) + '/' + id;
+    }
+
+    getResourceListUrl<T extends Resource>(resType: ResourceType<T>): string {
+        return this.baseUrl + JsonApiUrlBuilder.getResourcePath(resType);
+    }
+
+    private static getResourcePath<T extends Resource>(resType: ResourceType<T>): string {
+        const metadata = ModelMetadata.getClassMetadata(resType);
+
+        return (metadata.path) ? metadata.path : '/' + metadata.type;
+    }
+}

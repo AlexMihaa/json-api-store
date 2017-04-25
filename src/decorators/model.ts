@@ -23,7 +23,10 @@ export function Model(config?: ModelConfiguration): ClassDecorator {
         }
 
         if (config) {
-            metadata.type = (config.type) = config.type;
+            if (config.type) {
+                metadata.type = config.type;
+            }
+            metadata.path = config.path;
         }
 
         if (!metadata.type) {

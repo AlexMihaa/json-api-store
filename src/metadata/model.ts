@@ -6,6 +6,7 @@ import { Resource } from '../contracts/models/resource';
 
 export class ModelMetadata {
     public type: string;
+    public path: string;
     private attributes: AttributeMetadata[] = [];
     private relationships: RelationshipMetadata[] = [];
 

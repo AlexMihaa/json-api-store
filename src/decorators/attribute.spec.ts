@@ -4,51 +4,53 @@ import { AttributeMetadata } from '../metadata/attribute';
 import { ModelMetadata } from '../metadata/model';
 import { AttributeSerializer } from '../contracts/serializers/attribute';
 
-describe('AttributeDecorator', () => {
+describe('Decorators', () => {
+    describe("Attribute", () => {
 
-    class DumbSerializer implements AttributeSerializer {
-        serialize(value: any): any {
-            return value;
+        class DumbSerializer implements AttributeSerializer {
+            serialize(value: any): any {
+                return value;
+            }
+
+            deserialize(value: any): any {
+                return value;
+            }
         }
 
-        deserialize(value: any): any {
-            return value;
+        @Model({type: 'test'})
+        class TestResource {
+
+            @Attribute({field: 'firstName', serializer: new DumbSerializer()})
+            name: string;
+
+
+            @Attribute()
+            test: boolean;
         }
-    }
 
-    @Model({type: 'test'})
-    class TestResource {
+        it('should add attribute metadata', () => {
+            const metadata: ModelMetadata = (Reflect as any).getOwnMetadata(METADATA_KEY, TestResource);
+            const attrMetadata: AttributeMetadata = metadata.getAttribute('name');
 
-        @Attribute({field: 'firstName', serializer: new DumbSerializer()})
-        name: string;
+            expect(attrMetadata instanceof AttributeMetadata).toBeTruthy();
+            expect(attrMetadata.property).toEqual('name');
+            expect(attrMetadata.field).toEqual('firstName');
+            expect(attrMetadata.serializer instanceof DumbSerializer).toBeTruthy();
+        });
 
+        it('should remove original property', () => {
+            const instance = new TestResource();
 
-        @Attribute()
-        test: boolean;
-    }
+            expect(instance.hasOwnProperty('name')).toBeFalsy();
+        });
 
-    it('should add attribute metadata', () => {
-        const metadata: ModelMetadata = (Reflect as any).getOwnMetadata(METADATA_KEY, TestResource);
-        const attrMetadata: AttributeMetadata = metadata.getAttribute('name');
+        it('should provide getter and setter for original property', () => {
+            const instance: any = new TestResource();
+            instance.name = 'Test';
+            instance.test = true;
 
-        expect(attrMetadata instanceof AttributeMetadata).toBeTruthy();
-        expect(attrMetadata.property).toEqual('name');
-        expect(attrMetadata.field).toEqual('firstName');
-        expect(attrMetadata.serializer instanceof DumbSerializer).toBeTruthy();
-    });
-
-    it('should remove original property', () => {
-        const instance = new TestResource();
-
-        expect(instance.hasOwnProperty('name')).toBeFalsy();
-    });
-
-    it('should provide getter and setter for original property', () => {
-        const instance: any = new TestResource();
-        instance.name = 'Test';
-        instance.test = true;
-
-        expect(instance.name).toEqual('Test');
-        expect(instance.test).toEqual(true);
+            expect(instance.name).toEqual('Test');
+            expect(instance.test).toEqual(true);
+        });
     });
 });
