@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { Resource, ResourceType, ApiDocument } from './contracts';
-import { JsonApiDocumentSerializer } from './serializers';
-import { JsonApiStoreAdapter } from './services';
-import { JsonApiDocument } from './models';
-import { ResourceMetadata } from './metadata';
+import { Resource, ResourceType, ApiDocument } from '../contracts';
+import { JsonApiDocumentSerializer } from '../serializers';
+import { JsonApiStoreAdapter } from './store-adapter';
+import { JsonApiDocument } from '../models';
+import { ResourceMetadata } from '../metadata';
 
 @Injectable()
 export class JsonApiStore {
