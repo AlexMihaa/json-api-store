@@ -30,11 +30,31 @@ export class JsonApiStoreAdapter {
     }
 
     /**
-     * Add request interceptor
+     * Register request interceptor
      *
-     * @param interceptor
-     * @param resType
-     * @returns {JsonApiStoreAdapter}
+     * You can use {@link RequestInterceptor} to adjust request options before
+     * actual request will be sent. For example, it can be used to add API key
+     * to request headers:
+     *
+     * ```typescript
+     *
+     * const interceptor: RequestInterceptor = (options: RequestOptions) => {
+     *   options.headers.set('Authorization', 'YOUR_API_KEY_WILL_BE_HERE');
+     * };
+     * adapter.addRequestInterceptor(interceptor);
+     *
+     * ```
+     *
+     * If second parameter specified, registered interceptor will be called only
+     * before requests related to specified resource type:
+     *
+     * ```typescript
+     * const resType: ResourceType<User> = User;
+     * const interceptor: RequestInterceptor = (options: RequestOptions) => {
+     *   // ... perform some work here
+     * };
+     * adapter.addRequestInterceptor(interceptor, resType);
+     * ```
      */
     addRequestInterceptor<T extends Resource>(
         interceptor: RequestInterceptor,
@@ -50,12 +70,10 @@ export class JsonApiStoreAdapter {
     }
 
     /**
-     * Add response interceptor
+     * Register response interceptor
      *
-     * @param interceptor Interceptor that will be called on response from server
-     * @param resType Optional. If specified, interceptor will be called only on responses related to specified
-     *                  resource type
-     * @returns {JsonApiStoreAdapter}
+     * You can use {@link ResponseInterceptor} to adjust response before
+     * it will be processed by `JsonApiStoreAdapter'.
      */
     addResponseInterceptor<T extends Resource>(
         interceptor: ResponseInterceptor,
@@ -70,6 +88,9 @@ export class JsonApiStoreAdapter {
         return this;
     }
 
+    /**
+     * Register errors interceptor
+     */
     addErrorInterceptor<T extends Resource>(
         interceptor: ErrorInterceptor,
         resType: ResourceType<T>|string = 'global'

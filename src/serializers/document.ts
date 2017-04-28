@@ -31,6 +31,23 @@ export class JsonApiDocumentSerializer {
         return doc;
     }
 
+    serializeAsId<T extends Resource>(resources: T|T[]): ApiDocument {
+        const doc: ApiDocument = {};
+
+        const metadata = ModelMetadata.getObjectMetadata(resources);
+        if (Array.isArray(resources)) {
+            doc.data = [];
+
+            resources.forEach((resource: T) => {
+                (<ApiResource[]>doc.data).push(this.resSerializer.serializeAsId(resource, metadata));
+            });
+        } else {
+            doc.data = this.resSerializer.serializeAsId(resources, metadata);
+        }
+
+        return doc;
+    }
+
     deserialize<T extends Resource>(data: ApiDocument, resType: ResourceType<T>): JsonApiDocument<T|T[]> {
         let doc: JsonApiDocument<T|T[]>;
         if (data.data && Array.isArray(data.data)) {

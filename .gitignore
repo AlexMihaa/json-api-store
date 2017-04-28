@@ -55,6 +55,7 @@ __build__/**
 !/typings/custom.d.ts
 
 # Build Artifacts #
+/documentation
 release
 .ngc
 *.ngfactory.ts
