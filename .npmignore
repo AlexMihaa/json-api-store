@@ -1,0 +1,13 @@
+.idea
+
+/node_modules
+/coverage
+/src
+/test
+/config
+karma.conf.js
+tsconfig.json
+tslint.json
+yarn.lock
+.ngc
+*.ngfactory.ts

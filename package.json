@@ -1,10 +1,10 @@
 {
   "name": "@orbit/json-api-store",
-  "version": "0.0.21",
+  "version": "1.0.1",
   "description": "Store that allows you interact with JSON API backend",
   "scripts": {
     "clean": "rimraf dist coverage",
-    "ngc": "ngc -p config/tsconfig.build.json",
+    "build": "ngc -p config/tsconfig.build.json",
     "test": "karma start",
     "test:watch": "yarn run test -- --auto-watch --no-single-run"
   },

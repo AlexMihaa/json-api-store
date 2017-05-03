@@ -4,6 +4,7 @@ import { Headers, Http, Request, RequestMethod, RequestOptions, Response } from 
 import { Observable, ObservableInput } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 
 import { JsonApiUrlBuilder } from './url-builder';
 import { JsonApiParamsParser } from './params-parser';
