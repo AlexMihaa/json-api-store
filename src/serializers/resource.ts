@@ -1,15 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { ModelMetadata } from '../metadata/model';
-import { ResourceMetadata } from '../metadata/resource';
-import { ApiResource } from '../contracts/api/resource';
-import { AttributeMetadata } from '../metadata/attribute';
-import { ApiResourceId } from '../contracts/api/resource-id';
-import { RelationshipMetadata } from '../metadata/relationship';
-import { ApiRelationship } from '../contracts/api/relationship';
+import { ModelMetadata, ResourceMetadata, AttributeMetadata, RelationshipMetadata } from '../metadata';
+import { Resource, ResourceType, ApiResource, ApiResourceId, ApiRelationship } from '../contracts';
 import { SerializationContext } from './context';
-import { Resource } from '../contracts/models/resource';
-import { ResourceType } from '../contracts/models/resource-type';
 
 @Injectable()
 export class JsonApiResourceSerializer {

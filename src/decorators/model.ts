@@ -1,5 +1,5 @@
-import { ModelConfiguration } from '../contracts/configuration/model';
-import { ModelMetadata } from '../metadata/model';
+import { ModelConfiguration } from '../contracts';
+import { ModelMetadata } from '../metadata';
 
 export const METADATA_KEY = 'JsonApiResource';
 export const METADATA_PROPERTY = '__apiMetadata';

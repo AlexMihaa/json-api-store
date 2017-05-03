@@ -1,4 +1,4 @@
-import { AttributeSerializer } from '../serializers/attribute';
+import { AttributeSerializer } from '../serializers';
 
 /**
  * Configuration for {@link Attribute} decorator

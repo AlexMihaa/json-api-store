@@ -1,8 +1,13 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { HttpModule } from '@angular/http';
 
-import { JsonApiStore } from './services/store';
-import { JSON_API_BASE_URL, JsonApiUrlBuilder, JsonApiParamsParser, JsonApiStoreAdapter } from './services';
+import {
+    JSON_API_BASE_URL,
+    JsonApiUrlBuilder,
+    JsonApiParamsParser,
+    JsonApiStoreAdapter,
+    JsonApiStore
+} from './services';
 import { JsonApiResourceSerializer, JsonApiDocumentSerializer } from './serializers';
 
 @NgModule({

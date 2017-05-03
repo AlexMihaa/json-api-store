@@ -5,10 +5,10 @@
     "target": "es5",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "declaration": true,
+    "declaration": false,
     "moduleResolution": "node",
     "noUnusedLocals": true,
-    "outDir": "./release",
+    "outDir": "./build",
     "types": [
       "jasmine",
       "node",
@@ -24,12 +24,5 @@
   "files": [
     "./src/index.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "bundles"
-  ],
-  "angularCompilerOptions": {
-    "strictMetadataEmit": true,
-    "skipTemplateCodegen": true
-  }
+  "exclude": ["node_modules"]
 }

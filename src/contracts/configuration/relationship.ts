@@ -1,4 +1,4 @@
-import { ResourceType } from '../models/resource-type';
+import { ResourceType } from '../models';
 
 /**
  * Configuration object for {@link Relationship} decorator

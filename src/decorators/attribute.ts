@@ -1,8 +1,6 @@
-import { ModelMetadata } from '../metadata/model';
 import { METADATA_KEY, METADATA_PROPERTY } from './model';
-import { AttributeConfiguration } from '../contracts/configuration/attribute';
-import { AttributeMetadata } from '../metadata/attribute';
-import { ResourceMetadata } from '../metadata/resource';
+import { ModelMetadata, AttributeMetadata, ResourceMetadata } from '../metadata';
+import { AttributeConfiguration } from '../contracts';
 
 export function Attribute(config?: AttributeConfiguration): PropertyDecorator {
     return function (target: any, propertyName: string) {

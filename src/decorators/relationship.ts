@@ -1,8 +1,6 @@
 import { METADATA_KEY, METADATA_PROPERTY } from './model';
-import { ModelMetadata } from '../metadata/model';
-import { RelationshipMetadata } from '../metadata/relationship';
-import { RelationshipConfiguration } from '../contracts/configuration/relationship';
-import { ResourceMetadata } from '../metadata/resource';
+import { ModelMetadata, RelationshipMetadata, ResourceMetadata } from '../metadata';
+import { RelationshipConfiguration } from '../contracts';
 
 export function Relationship(config: RelationshipConfiguration): PropertyDecorator {
     return function (target: any, propertyName: string) {

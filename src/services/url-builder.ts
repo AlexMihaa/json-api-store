@@ -1,6 +1,7 @@
-import { Resource, ResourceType } from '../contracts';
 import { Inject, Injectable, InjectionToken } from '@angular/core';
-import { ModelMetadata } from '../metadata/model';
+
+import { Resource, ResourceType } from '../contracts';
+import { ModelMetadata } from '../metadata';
 
 export let JSON_API_BASE_URL = new InjectionToken<string>('json_api.base_url');
 
