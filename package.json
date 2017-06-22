@@ -1,6 +1,6 @@
 {
   "name": "@orbit/json-api-store",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Store that allows you interact with JSON API backend",
   "scripts": {
     "clean": "rimraf dist coverage",
