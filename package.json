@@ -11,9 +11,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "OrbitSoft LLC <support@orbitsoft.com>",
-  "license": "SEE IN FILE LICENSE.md",
+  "contributors": [
+    "Sergey Revenko <sergey.revenko@orbitsoft.com>"
+  ],
+  "license": "UNLICENSED",
   "publishConfig": {
-    "registry": "http://reva2.orbitsoft:8081/repository/private-npm/",
+    "registry": "http://npm.orbita1.ru:4873",
     "access": "restricted"
   },
   "peerDependencies": {

@@ -19,13 +19,13 @@ export class JsonApiStore {
     get<T extends Resource>(resType: ResourceType<T>, id: string, params?: any): Observable<JsonApiDocument<T>> {
         const request = this.adapter.get(resType, id, params);
 
-        return this.performRequest(request, resType);
+        return <Observable<JsonApiDocument<T>>>this.performRequest(request, resType);
     }
 
     getList<T extends Resource>(resType: ResourceType<T>, params?: any): Observable<JsonApiDocument<T[]>> {
         const request = this.adapter.getList(resType, params);
 
-        return this.performRequest(request, resType);
+        return <Observable<JsonApiDocument<T[]>>>this.performRequest(request, resType);
     }
 
     save<T extends Resource>(resources: T|T[], params?: any): Observable<JsonApiDocument<T|T[]>> {
