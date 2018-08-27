@@ -1,5 +1,6 @@
-import { RequestMethod, Response } from '@angular/http';
+import {HttpEvent} from "@angular/common/http";
+import {ApiDocument} from "../api";
 
 export interface ResponseInterceptor {
-    (response: Response, method: RequestMethod): void;
+    (response: HttpEvent<ApiDocument>, method: string): void;
 }

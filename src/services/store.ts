@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
-
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
+import {Observable, throwError} from "rxjs";
+import {catchError, map} from "rxjs/operators";
 
 import { Resource, ResourceType, ApiDocument } from '../contracts';
 import { JsonApiDocumentSerializer } from '../serializers';
@@ -44,7 +41,7 @@ export class JsonApiStore {
                 }]
             };
 
-            return this.performRequest(Observable.throw(doc), resType);
+            return this.performRequest(throwError(doc), resType);
         }
     }
 
@@ -69,17 +66,12 @@ export class JsonApiStore {
         request: Observable<ApiDocument>,
         resType: ResourceType<T>
     ): Observable<JsonApiDocument<T|T[]>> {
-        return request
-            .map((data: ApiDocument) => {
-                if (data) {
-                    return this.serializer.deserialize(data, resType);
-                }
-
-                return data;
+        return request.pipe(
+            map((data: ApiDocument) => this.serializer.deserialize(data, resType)),
+            catchError((error: ApiDocument) => {
+                return throwError(this.serializer.deserialize(error, resType));
             })
-            .catch((error: ApiDocument) => {
-                return Observable.throw(this.serializer.deserialize(error, resType));
-            });
+        );
     }
 
     private getResourceType<T extends Resource>(resource: T[] | T): ResourceType<T> {

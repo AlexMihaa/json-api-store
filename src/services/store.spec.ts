@@ -1,6 +1,5 @@
-import { inject, TestBed } from '@angular/core/testing';
-
-import { Observable } from 'rxjs/Rx';
+import {getTestBed, TestBed} from '@angular/core/testing';
+import { of, throwError } from "rxjs";
 
 import { JsonApiStore } from './store';
 import { JsonApiStoreAdapter } from './store-adapter';
@@ -9,6 +8,7 @@ import { ResourceMetadata } from '../metadata';
 import { JsonApiDocument } from '../models';
 
 import { User } from '../../test/models/user.model';
+
 
 describe('Services', () => {
     describe('JsonApiStore', () => {
@@ -30,16 +30,12 @@ describe('Services', () => {
                     JsonApiStore
                 ]
             });
-        });
 
-        beforeEach(inject(
-            [JsonApiDocumentSerializer, JsonApiStoreAdapter, JsonApiStore],
-            (_serializer: JsonApiDocumentSerializer, _adapter: JsonApiStoreAdapter, _store: JsonApiStore) => {
-                store = _store;
-                serializer = _serializer;
-                adapter = _adapter;
-            }
-        ));
+            const injector = getTestBed();
+            store = injector.get(JsonApiStore);
+            serializer = injector.get(JsonApiDocumentSerializer);
+            adapter = injector.get(JsonApiStoreAdapter);
+        });
 
         it('should return single resource', () => {
             const resType = User;
@@ -52,7 +48,7 @@ describe('Services', () => {
                 expect(id).toEqual(userId);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(response);
+                return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
@@ -84,7 +80,7 @@ describe('Services', () => {
                 expect(type).toEqual(resType);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(response);
+                return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
@@ -121,7 +117,7 @@ describe('Services', () => {
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(response);
+                return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
@@ -153,7 +149,6 @@ describe('Services', () => {
             const response = require('../../test/documents/users.json');
 
             spyOn(serializer, 'serialize').and.callThrough();
-
             adapter.create.and.callFake((type: any, payload: any, reqParams: any) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
@@ -164,21 +159,25 @@ describe('Services', () => {
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(response);
+                return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
+            store.save(newUsers, params).subscribe(
+                (doc: any) => {
+                    expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-            store.save(newUsers, params).subscribe((doc: any) => {
-                expect(serializer.deserialize).toHaveBeenCalledTimes(1);
+                    const call = (<any>serializer.deserialize).calls.mostRecent();
 
-                const call = (<any>serializer.deserialize).calls.mostRecent();
+                    expect(call.args[0]).toEqual(response);
+                    expect(call.args[1]).toEqual(User);
 
-                expect(call.args[0]).toEqual(response);
-                expect(call.args[1]).toEqual(User);
-
-                expect(doc).toEqual(call.returnValue);
-            });
+                    expect(doc).toEqual(call.returnValue);
+                },
+                err => {
+                    console.log(err);
+                }
+            );
         });
 
         it('should update existing resource', () => {
@@ -206,7 +205,7 @@ describe('Services', () => {
                 expect(payload).toEqual(serializeCall.returnValue);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(response);
+                return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
@@ -254,7 +253,7 @@ describe('Services', () => {
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(response);
+                return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
@@ -283,14 +282,14 @@ describe('Services', () => {
                 expect(id).toEqual(user.id);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(null);
+                return of(null);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
             store.remove(user, params).subscribe((doc: any) => {
                 expect(adapter.remove).toHaveBeenCalledTimes(1);
-                expect(serializer.deserialize).toHaveBeenCalledTimes(0);
+                expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
                 expect(doc).toBeNull();
             });
@@ -318,14 +317,14 @@ describe('Services', () => {
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
 
-                return Observable.of(null);
+                return of(null);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
             store.remove(users, params).subscribe((doc: any) => {
                 expect(adapter.removeAll).toHaveBeenCalledTimes(1);
-                expect(serializer.deserialize).toHaveBeenCalledTimes(0);
+                expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
                 expect(doc).toBeNull();
             });
@@ -335,7 +334,7 @@ describe('Services', () => {
             const response = require('../../test/documents/errors-response.json');
 
             adapter.get.and.callFake(() => {
-                return Observable.throw(response);
+                return throwError(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();

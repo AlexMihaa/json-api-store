@@ -1,67 +1,44 @@
-import { inject, TestBed } from '@angular/core/testing';
-import {
-    BaseRequestOptions,
-    Http,
-    HttpModule,
-    RequestMethod,
-    RequestOptions,
-    Response,
-    ResponseOptions
-} from '@angular/http';
-import { MockBackend, MockConnection } from '@angular/http/testing';
-
+import {getTestBed, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
+import {HttpResponse} from "@angular/common/http";
 
 import { JsonApiParamsParser } from './params-parser';
 import { JSON_API_BASE_URL, JsonApiUrlBuilder } from './url-builder';
 import { ApiDocument, RequestInterceptor, ResponseInterceptor } from '../contracts';
 import { JsonApiStoreAdapter } from './store-adapter';
 import { User } from '../../test/models/user.model';
-import { ApiError } from '../contracts/api/error';
+import { ApiError } from '../contracts/api';
 
 describe("Services", () => {
     describe('JsonApiStoreAdapter', () => {
-        let backend: MockBackend;
+        let backend: HttpTestingController;
         let builder: JsonApiUrlBuilder;
         let parser: JsonApiParamsParser;
         let adapter: JsonApiStoreAdapter;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
-                imports: [HttpModule],
+                imports: [HttpClientTestingModule],
                 providers: [
                     { provide: JSON_API_BASE_URL, useValue: 'http://api.com/v1'},
                     JsonApiUrlBuilder,
                     JsonApiParamsParser,
                     JsonApiStoreAdapter,
-                    MockBackend,
-                    BaseRequestOptions,
-                    {
-                        provide: Http,
-                        useFactory: (mockBackend: MockBackend, defaultOptions: RequestOptions) => {
-                            return new Http(mockBackend, defaultOptions);
-                        },
-                        deps: [MockBackend, BaseRequestOptions]
-                    }
                 ]
             });
+
+            const injector = getTestBed();
+            backend = injector.get(HttpTestingController);
+            builder = injector.get(JsonApiUrlBuilder);
+            parser = injector.get(JsonApiParamsParser);
+            adapter = injector.get(JsonApiStoreAdapter);
         });
 
-        beforeEach(inject(
-            [JsonApiUrlBuilder, JsonApiParamsParser, JsonApiStoreAdapter, MockBackend],
-            (
-                _builder: JsonApiUrlBuilder,
-                _parser: JsonApiParamsParser,
-                _adapter: JsonApiStoreAdapter,
-                _backend: MockBackend
-            ) => {
-                backend = _backend;
-                builder = _builder;
-                parser = _parser;
-                adapter = _adapter;
-            }
-        ));
+        afterEach(() => {
+            backend.verify();
+        });
 
-        it('should load single resource', () => {
+        it('should load single resource', async () => {
             const userId = '123';
             const response: ApiDocument = require('../../test/documents/user.json');
             const params = {
@@ -79,19 +56,6 @@ describe("Services", () => {
             spyOn(builder, 'getResourceUrl').and.callThrough();
             spyOn(parser, 'parse').and.callThrough();
 
-            backend.connections.subscribe((connection: MockConnection) => {
-                const req = connection.request;
-
-                expect(req.url).toEqual(expectedUrl);
-                expect(req.method).toEqual(RequestMethod.Get);
-                expect(req.headers.get('Content-Type')).toEqual(expectedMediaType);
-                expect(req.headers.get('Accept')).toEqual(expectedMediaType);
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    body: JSON.stringify(response)
-                })));
-            });
-
             adapter.addRequestInterceptor(gReqInterceptor);
             adapter.addRequestInterceptor(rReqInterceptor, User);
             adapter.addResponseInterceptor(gRespInterceptor);
@@ -103,21 +67,24 @@ describe("Services", () => {
                 expect(parser.parse).toHaveBeenCalledWith(params);
 
                 expect(gReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>gReqInterceptor).calls.mostRecent().args[0] instanceof  RequestOptions).toBeTruthy();
-
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>rReqInterceptor).calls.mostRecent().args[0] instanceof RequestOptions).toBeTruthy();
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
                 const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(gRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(gRespInterceptorArgs[1]).toEqual(RequestMethod.Get);
+                expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(gRespInterceptorArgs[1]).toEqual('GET');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
                 const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(rRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(rRespInterceptorArgs[1]).toEqual(RequestMethod.Get);
+                expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(rRespInterceptorArgs[1]).toEqual('GET');
             });
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            expect(apiReq.request.method).toBe('GET');
+            expect(apiReq.request.headers.get('Content-Type')).toBe(expectedMediaType);
+            expect(apiReq.request.headers.get('Accept')).toBe(expectedMediaType);
+            apiReq.flush(response);
         });
 
         it('should load list of resources', () => {
@@ -141,19 +108,6 @@ describe("Services", () => {
             spyOn(builder, 'getResourceListUrl').and.callThrough();
             spyOn(parser, 'parse').and.callThrough();
 
-            backend.connections.subscribe((connection: MockConnection) => {
-                const req = connection.request;
-
-                expect(req.url).toEqual(expectedUrl);
-                expect(req.method).toEqual(RequestMethod.Get);
-                expect(req.headers.get('Content-Type')).toEqual(expectedMediaType);
-                expect(req.headers.get('Accept')).toEqual(expectedMediaType);
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    body: JSON.stringify(response)
-                })));
-            });
-
             adapter.addRequestInterceptor(gReqInterceptor);
             adapter.addRequestInterceptor(rReqInterceptor, User);
             adapter.addResponseInterceptor(gRespInterceptor);
@@ -165,21 +119,24 @@ describe("Services", () => {
                 expect(parser.parse).toHaveBeenCalledWith(params);
 
                 expect(gReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>gReqInterceptor).calls.mostRecent().args[0] instanceof  RequestOptions).toBeTruthy();
-
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>rReqInterceptor).calls.mostRecent().args[0] instanceof RequestOptions).toBeTruthy();
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
                 const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(gRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(gRespInterceptorArgs[1]).toEqual(RequestMethod.Get);
+                expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(gRespInterceptorArgs[1]).toEqual('GET');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
                 const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(rRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(rRespInterceptorArgs[1]).toEqual(RequestMethod.Get);
+                expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(rRespInterceptorArgs[1]).toEqual('GET');
             });
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            expect(apiReq.request.method).toBe('GET');
+            expect(apiReq.request.headers.get('Content-Type')).toBe(expectedMediaType);
+            expect(apiReq.request.headers.get('Accept')).toBe(expectedMediaType);
+            apiReq.flush(response);
         });
 
         it('should create new resource', () => {
@@ -198,21 +155,6 @@ describe("Services", () => {
             spyOn(builder, 'getResourceListUrl').and.callThrough();
             spyOn(parser, 'parse').and.callThrough();
 
-            backend.connections.subscribe((connection: MockConnection) => {
-                const req = connection.request;
-
-                expect(req.url).toEqual(expectedUrl);
-                expect(req.method).toEqual(RequestMethod.Post);
-                expect(JSON.parse(req.getBody())).toEqual(payload);
-                expect(req.headers.get('Content-Type')).toEqual(expectedMediaType);
-                expect(req.headers.get('Accept')).toEqual(expectedMediaType);
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    status: 201,
-                    body: JSON.stringify(response)
-                })));
-            });
-
             adapter.addRequestInterceptor(gReqInterceptor);
             adapter.addRequestInterceptor(rReqInterceptor, User);
             adapter.addResponseInterceptor(gRespInterceptor);
@@ -224,21 +166,25 @@ describe("Services", () => {
                 expect(parser.parse).toHaveBeenCalledWith(params);
 
                 expect(gReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>gReqInterceptor).calls.mostRecent().args[0] instanceof  RequestOptions).toBeTruthy();
-
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>rReqInterceptor).calls.mostRecent().args[0] instanceof RequestOptions).toBeTruthy();
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
                 const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(gRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(gRespInterceptorArgs[1]).toEqual(RequestMethod.Post);
+                expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(gRespInterceptorArgs[1]).toEqual('POST');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
                 const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(rRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(rRespInterceptorArgs[1]).toEqual(RequestMethod.Post);
+                expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(rRespInterceptorArgs[1]).toEqual('POST');
             });
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            expect(apiReq.request.method).toBe('POST');
+            expect(apiReq.request.body).toEqual(payload);
+            expect(apiReq.request.headers.get('Content-Type')).toEqual(expectedMediaType);
+            expect(apiReq.request.headers.get('Accept')).toEqual(expectedMediaType);
+            apiReq.flush(response, {status: 201, statusText: 'Created'});
         });
 
         it('should update single resource', () => {
@@ -258,20 +204,6 @@ describe("Services", () => {
             spyOn(builder, 'getResourceUrl').and.callThrough();
             spyOn(parser, 'parse').and.callThrough();
 
-            backend.connections.subscribe((connection: MockConnection) => {
-                const req = connection.request;
-
-                expect(req.url).toEqual(expectedUrl);
-                expect(req.method).toEqual(RequestMethod.Patch);
-                expect(JSON.parse(req.getBody())).toEqual(payload);
-                expect(req.headers.get('Content-Type')).toEqual(expectedMediaType);
-                expect(req.headers.get('Accept')).toEqual(expectedMediaType);
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    body: JSON.stringify(response)
-                })));
-            });
-
             adapter.addRequestInterceptor(gReqInterceptor);
             adapter.addRequestInterceptor(rReqInterceptor, User);
             adapter.addResponseInterceptor(gRespInterceptor);
@@ -283,21 +215,25 @@ describe("Services", () => {
                 expect(parser.parse).toHaveBeenCalledWith(params);
 
                 expect(gReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>gReqInterceptor).calls.mostRecent().args[0] instanceof  RequestOptions).toBeTruthy();
-
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>rReqInterceptor).calls.mostRecent().args[0] instanceof RequestOptions).toBeTruthy();
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
                 const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(gRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(gRespInterceptorArgs[1]).toEqual(RequestMethod.Patch);
+                expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(gRespInterceptorArgs[1]).toEqual('PATCH');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
                 const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(rRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(rRespInterceptorArgs[1]).toEqual(RequestMethod.Patch);
+                expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(rRespInterceptorArgs[1]).toEqual('PATCH');
             });
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            expect(apiReq.request.method).toBe('PATCH');
+            expect(apiReq.request.body).toEqual(payload);
+            expect(apiReq.request.headers.get('Content-Type')).toEqual(expectedMediaType);
+            expect(apiReq.request.headers.get('Accept')).toEqual(expectedMediaType);
+            apiReq.flush(response);
         });
 
         it('should update all specified resources', () => {
@@ -316,20 +252,6 @@ describe("Services", () => {
             spyOn(builder, 'getResourceListUrl').and.callThrough();
             spyOn(parser, 'parse').and.callThrough();
 
-            backend.connections.subscribe((connection: MockConnection) => {
-                const req = connection.request;
-
-                expect(req.url).toEqual(expectedUrl);
-                expect(req.method).toEqual(RequestMethod.Patch);
-                expect(JSON.parse(req.getBody())).toEqual(payload);
-                expect(req.headers.get('Content-Type')).toEqual(expectedMediaType);
-                expect(req.headers.get('Accept')).toEqual(expectedMediaType);
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    body: JSON.stringify(response)
-                })));
-            });
-
             adapter.addRequestInterceptor(gReqInterceptor);
             adapter.addRequestInterceptor(rReqInterceptor, User);
             adapter.addResponseInterceptor(gRespInterceptor);
@@ -341,21 +263,25 @@ describe("Services", () => {
                 expect(parser.parse).toHaveBeenCalledWith(params);
 
                 expect(gReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>gReqInterceptor).calls.mostRecent().args[0] instanceof  RequestOptions).toBeTruthy();
-
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>rReqInterceptor).calls.mostRecent().args[0] instanceof RequestOptions).toBeTruthy();
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
                 const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(gRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(gRespInterceptorArgs[1]).toEqual(RequestMethod.Patch);
+                expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(gRespInterceptorArgs[1]).toEqual('PATCH');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
                 const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(rRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(rRespInterceptorArgs[1]).toEqual(RequestMethod.Patch);
+                expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(rRespInterceptorArgs[1]).toEqual('PATCH');
             });
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            expect(apiReq.request.method).toBe('PATCH');
+            expect(apiReq.request.body).toEqual(payload);
+            expect(apiReq.request.headers.get('Content-Type')).toBe(expectedMediaType);
+            expect(apiReq.request.headers.get('Accept')).toBe(expectedMediaType);
+            apiReq.flush(response);
         });
 
         it('should delete single resource', () => {
@@ -371,19 +297,6 @@ describe("Services", () => {
 
             spyOn(builder, 'getResourceUrl').and.callThrough();
 
-            backend.connections.subscribe((connection: MockConnection) => {
-                const req = connection.request;
-
-                expect(req.url).toEqual(expectedUrl);
-                expect(req.method).toEqual(RequestMethod.Delete);
-                expect(req.headers.get('Content-Type')).toEqual(expectedMediaType);
-                expect(req.headers.get('Accept')).toEqual(expectedMediaType);
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    status: 204
-                })));
-            });
-
             adapter.addRequestInterceptor(gReqInterceptor);
             adapter.addRequestInterceptor(rReqInterceptor, User);
             adapter.addResponseInterceptor(gRespInterceptor);
@@ -394,21 +307,24 @@ describe("Services", () => {
                 expect(builder.getResourceUrl).toHaveBeenCalledWith(User, id);
 
                 expect(gReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>gReqInterceptor).calls.mostRecent().args[0] instanceof  RequestOptions).toBeTruthy();
-
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>rReqInterceptor).calls.mostRecent().args[0] instanceof RequestOptions).toBeTruthy();
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
                 const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(gRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(gRespInterceptorArgs[1]).toEqual(RequestMethod.Delete);
+                expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(gRespInterceptorArgs[1]).toEqual('DELETE');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
                 const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(rRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(rRespInterceptorArgs[1]).toEqual(RequestMethod.Delete);
+                expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(rRespInterceptorArgs[1]).toEqual('DELETE');
             });
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            expect(apiReq.request.method).toBe('DELETE');
+            expect(apiReq.request.headers.get('Content-Type')).toBe(expectedMediaType);
+            expect(apiReq.request.headers.get('Accept')).toBe(expectedMediaType);
+            apiReq.flush(null, {status: 204, statusText: "No content"});
         });
 
         it('should delete all specified resources', () => {
@@ -424,20 +340,6 @@ describe("Services", () => {
 
             spyOn(builder, 'getResourceListUrl').and.callThrough();
 
-            backend.connections.subscribe((connection: MockConnection) => {
-                const req = connection.request;
-
-                expect(req.url).toEqual(expectedUrl);
-                expect(req.method).toEqual(RequestMethod.Delete);
-                expect(JSON.parse(req.getBody())).toEqual(payload);
-                expect(req.headers.get('Content-Type')).toEqual(expectedMediaType);
-                expect(req.headers.get('Accept')).toEqual(expectedMediaType);
-
-                connection.mockRespond(new Response(new ResponseOptions({
-                    status: 204
-                })));
-            });
-
             adapter.addRequestInterceptor(gReqInterceptor);
             adapter.addRequestInterceptor(rReqInterceptor, User);
             adapter.addResponseInterceptor(gRespInterceptor);
@@ -448,32 +350,28 @@ describe("Services", () => {
                 expect(builder.getResourceListUrl).toHaveBeenCalledWith(User);
 
                 expect(gReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>gReqInterceptor).calls.mostRecent().args[0] instanceof  RequestOptions).toBeTruthy();
-
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
-                expect((<any>rReqInterceptor).calls.mostRecent().args[0] instanceof RequestOptions).toBeTruthy();
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
                 const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(gRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(gRespInterceptorArgs[1]).toEqual(RequestMethod.Delete);
+                expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(gRespInterceptorArgs[1]).toEqual('DELETE');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
                 const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
-                expect(rRespInterceptorArgs[0] instanceof Response).toBeTruthy();
-                expect(rRespInterceptorArgs[1]).toEqual(RequestMethod.Delete);
+                expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
+                expect(rRespInterceptorArgs[1]).toEqual('DELETE');
             });
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            expect(apiReq.request.method).toBe('DELETE');
+            expect(apiReq.request.headers.get('Content-Type')).toBe(expectedMediaType);
+            expect(apiReq.request.headers.get('Accept')).toBe(expectedMediaType);
+            apiReq.flush(null, {status: 204, statusText: 'No content'});
         });
 
         it('should handle API errors', () => {
-            const response: Response = new Response(new ResponseOptions({
-                status: 404,
-                body: JSON.stringify(require('../../test/documents/errors-response.json'))
-            }));
-
-            backend.connections.subscribe((connection: MockConnection) => {
-                connection.mockError(response as any as Error);
-            });
+            const response = require('../../test/documents/errors-response.json');
 
             const gErrorInterceptor = jasmine.createSpy('gErrorInterceptor');
             const rErrorInterceptor = jasmine.createSpy('rErrorInterceptor');
@@ -494,14 +392,15 @@ describe("Services", () => {
                     expect((<any>rErrorInterceptor).calls.mostRecent().args[0]).toEqual(response);
                 }
             );
+
+            const expectedUrl = builder.getResourceUrl(User, '1');
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            apiReq.flush(response, {status: 400, statusText: 'Not found'});
         });
 
         it('should handle general errors', () => {
-            const error = new Error('Test error');
-
-            backend.connections.subscribe((connection: MockConnection) => {
-                connection.mockError(error);
-            });
+            const error = new ErrorEvent('Test error');
 
             const gErrorInterceptor = jasmine.createSpy('gErrorInterceptor');
             const rErrorInterceptor = jasmine.createSpy('rErrorInterceptor');
@@ -513,22 +412,22 @@ describe("Services", () => {
                     fail('This response should trigger error');
                 },
                 (err: ApiDocument) => {
-                    expect(typeof err).toEqual('object');
-                    expect(Array.isArray(err.errors)).toBeTruthy();
                     expect(err.errors.length).toEqual(1);
 
                     const details: ApiError = err.errors[0];
                     expect(typeof details.id).toEqual('string');
-                    expect(details.status).toEqual('400');
-                    expect(details.title).toEqual(error.toString());
+                    expect(details.status).toEqual('500');
+                    expect(details.title).toEqual('Internal server error');
 
                     expect(gErrorInterceptor).toHaveBeenCalledTimes(1);
-                    expect((<any>gErrorInterceptor).calls.mostRecent().args[0]).toEqual(error);
-
                     expect(rErrorInterceptor).toHaveBeenCalledTimes(1);
-                    expect((<any>rErrorInterceptor).calls.mostRecent().args[0]).toEqual(error);
                 }
             );
+
+            const expectedUrl = builder.getResourceUrl(User, '1');
+
+            const apiReq = backend.expectOne(req => req.urlWithParams === expectedUrl);
+            apiReq.error(error, {status: 500, statusText: 'Internal server error' });
         });
     });
 });

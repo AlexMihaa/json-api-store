@@ -1,5 +1,5 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from "@angular/common/http";
 
 import {
     JSON_API_BASE_URL,
@@ -12,7 +12,7 @@ import { JsonApiResourceSerializer, JsonApiDocumentSerializer } from './serializ
 
 @NgModule({
     imports: [
-        HttpModule
+        HttpClientModule
     ]
 })
 export class JsonApiModule {
