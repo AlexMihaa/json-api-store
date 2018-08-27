@@ -1,21 +1,27 @@
-import { Injectable } from '@angular/core';
-import { Headers, Http, Request, RequestMethod, RequestOptions, Response } from '@angular/http';
-
-import { Observable, ObservableInput } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
-
-import { JsonApiUrlBuilder } from './url-builder';
-import { JsonApiParamsParser } from './params-parser';
+import {Injectable} from '@angular/core';
 import {
+    HttpClient,
+    HttpErrorResponse,
+    HttpEventType,
+    HttpHeaders,
+    HttpRequest,
+    HttpResponse
+} from "@angular/common/http";
+import {Observable, throwError} from "rxjs";
+import {catchError, filter, map} from "rxjs/operators";
+
+import {JsonApiUrlBuilder} from './url-builder';
+import {JsonApiParamsParser} from './params-parser';
+import {
+    ApiDocument,
+    ErrorInterceptor,
+    RequestInterceptor,
+    RequestParams,
     Resource,
     ResourceType,
-    ApiDocument,
-    RequestInterceptor,
-    ResponseInterceptor,
-    ErrorInterceptor
+    ResponseInterceptor
 } from '../contracts';
+
 
 @Injectable()
 export class JsonApiStoreAdapter {
@@ -24,7 +30,7 @@ export class JsonApiStoreAdapter {
     private respInterceptors: Map<any, Set<ResponseInterceptor>>;
     private errInterceptors: Map<any, Set<ErrorInterceptor>>;
 
-    constructor(private http: Http, private urlBuilder: JsonApiUrlBuilder, private parser: JsonApiParamsParser) {
+    constructor(private http: HttpClient, private urlBuilder: JsonApiUrlBuilder, private parser: JsonApiParamsParser) {
         this.reqInterceptors = new Map();
         this.respInterceptors = new Map();
         this.errInterceptors = new Map();
@@ -108,19 +114,19 @@ export class JsonApiStoreAdapter {
     get<T extends Resource>(resType: ResourceType<T>, id: string, params?: any): Observable<ApiDocument> {
         const url = this.urlBuilder.getResourceUrl(resType, id);
 
-        return this.sendRequest(resType, url, RequestMethod.Get, params);
+        return this.sendRequest(resType, url, "GET", params);
     }
 
     getList<T extends Resource>(resType: ResourceType<T>, params?: any): Observable<ApiDocument> {
         const url = this.urlBuilder.getResourceListUrl(resType);
 
-        return this.sendRequest(resType, url, RequestMethod.Get, params);
+        return this.sendRequest(resType, url, "GET", params);
     }
 
     create<T extends Resource>(resType: ResourceType<T>, payload: ApiDocument, params?: any): Observable<ApiDocument> {
         const url = this.urlBuilder.getResourceListUrl(resType);
 
-        return this.sendRequest(resType, url, RequestMethod.Post, params, payload);
+        return this.sendRequest(resType, url, "POST", params, payload);
     }
 
     update<T extends Resource>(
@@ -131,7 +137,7 @@ export class JsonApiStoreAdapter {
     ): Observable<ApiDocument> {
         const url = this.urlBuilder.getResourceUrl(resType, id);
 
-        return this.sendRequest(resType, url, RequestMethod.Patch, params, payload);
+        return this.sendRequest(resType, url, "PATCH", params, payload);
     }
 
     updateAll<T extends Resource>(
@@ -141,13 +147,13 @@ export class JsonApiStoreAdapter {
     ): Observable<ApiDocument> {
         const url = this.urlBuilder.getResourceListUrl(resType);
 
-        return this.sendRequest(resType, url, RequestMethod.Patch, params, payload);
+        return this.sendRequest(resType, url, "PATCH", params, payload);
     }
 
     remove<T extends Resource>(resType: ResourceType<T>, id: string, params?: any): Observable<ApiDocument> {
         const url = this.urlBuilder.getResourceUrl(resType, id);
 
-        return this.sendRequest(resType, url, RequestMethod.Delete, params);
+        return this.sendRequest(resType, url, "DELETE", params);
     }
 
     removeAll<T extends Resource>(
@@ -157,64 +163,67 @@ export class JsonApiStoreAdapter {
     ): Observable<ApiDocument> {
         const url = this.urlBuilder.getResourceListUrl(resType);
 
-        return this.sendRequest(resType, url, RequestMethod.Delete, params, payalod);
+        return this.sendRequest(resType, url, "DELETE", params, payalod);
     }
 
     private sendRequest<T extends Resource>(
         resType: ResourceType<T>,
         url: string,
-        method: RequestMethod,
+        method: string,
         params?: any,
         body?: ApiDocument
     ): Observable<ApiDocument> {
         const request = this.prepareRequest(resType, url, method, params, body);
 
-        return this.http.request(request)
-            .map((response: Response) => this.parseResponse(resType, method, response))
-            .catch((error: any|Response) => this.handleError(resType, error));
+        return this.http.request<ApiDocument>(request).pipe(
+            filter((resp: HttpResponse<ApiDocument>) => resp.type === HttpEventType.Response),
+            map((response: HttpResponse<ApiDocument>) => this.parseResponse(resType, method, response)),
+            catchError(error => this.handleError(resType, error))
+        );
     }
 
     private prepareRequest<T extends Resource>(
         resType: ResourceType<T>,
         url: string,
-        method: RequestMethod,
+        method: string,
         params?: any,
         body?: ApiDocument
-    ): Request {
-        const options = new RequestOptions({
+    ): HttpRequest<ApiDocument> {
+        const reqParams: RequestParams = {
             url: url,
             method: method,
             body: body,
-            search: (params) ? this.parser.parse(params) : undefined,
-            headers: this.prepareHeaders()
-        });
+            query: (params) ? this.parser.parse(params) : undefined,
+            headers: new HttpHeaders({
+                'Content-Type': 'application/vnd.api+json',
+                'Accept': 'application/vnd.api+json'
+            })
+        };
 
         if (this.reqInterceptors.has('global')) {
             this.reqInterceptors.get('global').forEach((interceptor: RequestInterceptor) => {
-                interceptor(options);
+                interceptor(reqParams);
             });
         }
 
         if (this.reqInterceptors.has(resType)) {
             this.reqInterceptors.get(resType).forEach((interceptor: RequestInterceptor) => {
-                interceptor(options);
+                interceptor(reqParams);
             });
         }
 
-        return new Request(options);
-    }
-
-    private prepareHeaders() {
-        return new Headers({
-            'Content-Type': 'application/vnd.api+json',
-            'Accept': 'application/vnd.api+json'
-        });
+        return new HttpRequest(
+            reqParams.method,
+            reqParams.url,
+            reqParams.body,
+            {params: reqParams.query, headers: reqParams.headers, responseType: 'json', reportProgress: false}
+        );
     }
 
     private parseResponse<T extends Resource>(
         resType: ResourceType<T>,
-        method: RequestMethod,
-        response: Response
+        method: string,
+        response: HttpResponse<ApiDocument>
     ): ApiDocument {
         if (this.respInterceptors.has('global')) {
             this.respInterceptors.get('global').forEach((interceptor: ResponseInterceptor) => {
@@ -228,13 +237,13 @@ export class JsonApiStoreAdapter {
             });
         }
 
-        return response.json();
+        return response.body;
     }
 
     private handleError<T extends Resource>(
         resType: ResourceType<T>,
-        error: any|Response
-    ): ObservableInput<ApiDocument> {
+        error: HttpErrorResponse
+    ): Observable<ApiDocument> {
         if (this.errInterceptors.has('global')) {
             this.errInterceptors.get('global').forEach((interceptor: ErrorInterceptor) => {
                 interceptor(error);
@@ -247,21 +256,16 @@ export class JsonApiStoreAdapter {
             });
         }
 
-        let doc: ApiDocument;
-        if (error instanceof Response) {
-            doc = <ApiDocument>error.json();
-        } else {
-            doc = {
-                errors: [
-                    {
-                        id: Math.random().toString(),
-                        status: '400',
-                        title: error.toString()
-                    }
-                ]
-            };
-        }
+        let doc: ApiDocument = {
+            errors: [
+                {
+                    id: Math.random().toString(),
+                    status: error.status.toString(),
+                    title: error.statusText
+                }
+            ]
+        };
 
-        return Observable.throw(doc);
+        return throwError(doc);
     }
 }

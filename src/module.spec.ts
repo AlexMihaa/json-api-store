@@ -1,4 +1,4 @@
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from "@angular/common/http";
 import { TestBed } from '@angular/core/testing';
 
 import { JsonApiModule } from './module';
@@ -10,7 +10,7 @@ describe('JsonApiModule', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpModule,
+                HttpClientModule,
                 JsonApiModule.forRoot('http://api.org/v1')
             ]
         });

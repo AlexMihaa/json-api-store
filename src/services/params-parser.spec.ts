@@ -1,5 +1,3 @@
-import { URLSearchParams } from '@angular/http';
-
 import { JsonApiParamsParser } from './params-parser';
 
 describe('Services', () => {
@@ -15,7 +13,6 @@ describe('Services', () => {
 
             const params = parser.parse(data);
 
-            expect(params instanceof URLSearchParams).toBeTruthy();
             expect(params.toString()).toEqual(data);
         });
 
@@ -31,7 +28,6 @@ describe('Services', () => {
 
             const params = parser.parse(data);
 
-            expect(params instanceof URLSearchParams).toBeTruthy();
             expect(params.toString()).toEqual('include=users,offices&page%5Bnumber%5D=1&page%5Bsize%5D=10&simple=test');
         });
     });

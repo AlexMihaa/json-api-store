@@ -46,6 +46,10 @@ export class JsonApiDocumentSerializer {
     }
 
     deserialize<T extends Resource>(data: ApiDocument, resType: ResourceType<T>): JsonApiDocument<T|T[]> {
+        if (data == null) {
+            return null;
+        }
+
         let doc: JsonApiDocument<T|T[]>;
         if (data.data && Array.isArray(data.data)) {
             doc = <JsonApiDocument<T[]>> new JsonApiDocument();

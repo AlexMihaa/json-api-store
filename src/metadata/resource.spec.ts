@@ -1,6 +1,5 @@
 import { ResourceMetadata } from './resource';
-import { Model } from '../decorators/model';
-import { Attribute } from '../decorators/attribute';
+import { Model, Attribute } from '../decorators';
 
 describe('Metadata', () => {
     describe('Resource', () => {

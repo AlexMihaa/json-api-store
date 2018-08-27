@@ -1,4 +1,5 @@
+import {HttpErrorResponse} from "@angular/common/http";
 
 export interface ErrorInterceptor {
-    (error: any|Response): void;
+    (error: HttpErrorResponse): void;
 }

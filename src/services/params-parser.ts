@@ -1,16 +1,16 @@
-import { URLSearchParams } from '@angular/http';
+import {HttpParams} from "@angular/common/http";
 
 export class JsonApiParamsParser {
 
-    parse(data: Object|string): URLSearchParams {
+    parse(data: Object|string): HttpParams {
         if ('string' === typeof data) {
-            return new URLSearchParams(data);
+            return new HttpParams({fromString: data});
         }
 
-        return this.serializeData(data, new URLSearchParams());
+        return this.serializeData(data, new HttpParams());
     }
 
-    private serializeData(data: any, params: URLSearchParams, prefix: string = ''): URLSearchParams {
+    private serializeData(data: any, params: HttpParams, prefix: string = ''): HttpParams {
         for (let property in data) {
             if (!data.hasOwnProperty(property)) {
                 continue;
@@ -19,13 +19,14 @@ export class JsonApiParamsParser {
             const paramName = (prefix) ? prefix + '[' + property + ']' : property;
 
             if (Array.isArray(data[property])) {
-                params.append(paramName, data[property].join(','));
+                params = params.set(paramName, data[property].join(','));
             } else if (data[property] instanceof Object) {
-                this.serializeData(data[property], params, paramName);
+                params = this.serializeData(data[property], params, paramName);
             } else {
-                params.append(paramName, data[property].toString());
+                params = params.set(paramName, data[property].toString());
             }
         }
+
         return params;
     }
 }

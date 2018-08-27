@@ -1,8 +1,7 @@
 import { Model, METADATA_KEY } from './model';
 import { Attribute } from './attribute';
-import { AttributeMetadata } from '../metadata/attribute';
-import { ModelMetadata } from '../metadata/model';
-import { AttributeSerializer } from '../contracts/serializers/attribute';
+import { AttributeMetadata, ModelMetadata } from '../metadata';
+import { AttributeSerializer } from '../contracts/serializers';
 
 describe('Decorators', () => {
     describe("Attribute", () => {

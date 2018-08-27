@@ -1,8 +1,7 @@
 import { Model, METADATA_KEY } from './model';
 import { Attribute } from './attribute';
 import { Relationship } from './relationship';
-import { RelationshipMetadata } from '../metadata/relationship';
-import { ModelMetadata } from '../metadata/model';
+import { RelationshipMetadata, ModelMetadata } from '../metadata';
 
 describe('Decorators', () => {
     describe('Relationship', () => {

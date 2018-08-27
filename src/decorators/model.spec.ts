@@ -1,7 +1,6 @@
 import { Model, METADATA_KEY } from './model';
-import { ModelMetadata } from '../metadata/model';
+import { ModelMetadata, AttributeMetadata } from '../metadata';
 import { Attribute } from './attribute';
-import { AttributeMetadata } from '../metadata/attribute';
 
 describe('Decorators', () => {
     describe('Model', () => {

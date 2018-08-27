@@ -31,7 +31,7 @@ yarn add @orbit/json-api-store
 ```typescript
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { JsonApiModule } from '@orbit/json-api-store';
 
 import { AppComponent } from './app.component';
@@ -42,7 +42,7 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    HttpModule,
+    HttpClientModule,
     JsonApiModule.forRoot('http://localhost:4200/api')
   ],
   providers: [],
