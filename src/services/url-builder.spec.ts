@@ -39,6 +39,12 @@ describe('Services', () => {
             expect(url).toEqual(baseUrl + '/users/123');
         });
 
+        it('should build custom URL', () => {
+            const url = builder.getCustomUrl("/custom");
+
+            expect(url).toEqual(baseUrl + '/custom');
+        });
+
         it('should use path from resource metadata', () => {
             const url = builder.getResourceUrl(Office, '123');
             const listUrl = builder.getResourceListUrl(Office);

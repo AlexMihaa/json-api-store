@@ -1,14 +1,13 @@
 import {getTestBed, TestBed} from '@angular/core/testing';
 import { of, throwError } from "rxjs";
 
-import { JsonApiStore } from './store';
+import {JsonApiStore, Options} from './store';
 import { JsonApiStoreAdapter } from './store-adapter';
 import { JsonApiDocumentSerializer, JsonApiResourceSerializer } from '../serializers';
 import { ResourceMetadata } from '../metadata';
 import { JsonApiDocument } from '../models';
 
 import { User } from '../../test/models/user.model';
-
 
 describe('Services', () => {
     describe('JsonApiStore', () => {
@@ -41,19 +40,21 @@ describe('Services', () => {
             const resType = User;
             const userId = '123';
             const params = { include: ['offices', 'user-roles'] };
+            const options: Options = {path: "custom"};
             const response = require('../../test/documents/user.json');
 
-            adapter.get.and.callFake((type: any, id: any, reqParams: any) => {
+            adapter.get.and.callFake((type: any, id: any, reqParams: any, opts: Options) => {
                 expect(type).toEqual(resType);
                 expect(id).toEqual(userId);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
-            store.get(resType, userId, params).subscribe((doc: any) => {
+            store.get(resType, userId, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
                 const call = (<any>serializer.deserialize).calls.mostRecent();
@@ -74,18 +75,20 @@ describe('Services', () => {
                     size: 10
                 }
             };
+            const options: Options = {path: "/custom"};
             const response = require('../../test/documents/users.json');
 
-            adapter.getList.and.callFake((type: any, reqParams: any) => {
+            adapter.getList.and.callFake((type: any, reqParams: any, opts: Options) => {
                 expect(type).toEqual(resType);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
-            store.getList(resType, params).subscribe((doc: any) => {
+            store.getList(resType, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
                 const call = (<any>serializer.deserialize).calls.mostRecent();
@@ -103,11 +106,12 @@ describe('Services', () => {
             user.email = 'test@test.com';
 
             const params = { include: 'user-roles'};
+            const options: Options = {path: "/custom"};
             const response = require('../../test/documents/user.json');
 
             spyOn(serializer, 'serialize').and.callThrough();
 
-            adapter.create.and.callFake((type: any, payload: any, reqParams: any) => {
+            adapter.create.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
                 const serializerCall = (<any>serializer.serialize).calls.mostRecent();
@@ -116,13 +120,14 @@ describe('Services', () => {
                 expect(type).toEqual(User);
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
-            store.save(user, params).subscribe((doc: any) => {
+            store.save(user, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
                 const call = (<any>serializer.deserialize).calls.mostRecent();
@@ -146,10 +151,11 @@ describe('Services', () => {
             const newUsers = [user1, user2];
 
             const params = { include: ['user-roles'] };
+            const options: Options = {path: "/custom"};
             const response = require('../../test/documents/users.json');
 
             spyOn(serializer, 'serialize').and.callThrough();
-            adapter.create.and.callFake((type: any, payload: any, reqParams: any) => {
+            adapter.create.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
                 const serializerCall = (<any>serializer.serialize).calls.mostRecent();
@@ -158,12 +164,13 @@ describe('Services', () => {
                 expect(type).toEqual(User);
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
-            store.save(newUsers, params).subscribe(
+            store.save(newUsers, params, options).subscribe(
                 (doc: any) => {
                     expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
@@ -190,11 +197,12 @@ describe('Services', () => {
             user.name = 'New name';
 
             const params = { include: ['user-roles'] };
+            const options: Options = {path: "/custom"};
             const response = require('../../test/documents/user.json');
 
             spyOn(serializer, 'serialize').and.callThrough();
 
-            adapter.update.and.callFake((type: any, id: any, payload: any, reqParams: any) => {
+            adapter.update.and.callFake((type: any, id: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
                 const serializeCall = (<any>serializer.serialize).calls.mostRecent();
@@ -204,13 +212,14 @@ describe('Services', () => {
                 expect(id).toEqual(user.id);
                 expect(payload).toEqual(serializeCall.returnValue);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
-            store.save(user, params).subscribe((doc: any) => {
+            store.save(user, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
                 const call = (<any>serializer.deserialize).calls.mostRecent();
@@ -239,11 +248,12 @@ describe('Services', () => {
 
             const users = [user1, user2];
             const params = { include: ['offices'] };
+            const options: Options = {path: "/custom"};
             const response = require('../../test/documents/users.json');
 
             spyOn(serializer, 'serialize').and.callThrough();
 
-            adapter.updateAll.and.callFake((type: any, payload: any, reqParams: any) => {
+            adapter.updateAll.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
                 const serializerCall = (<any>serializer.serialize).calls.mostRecent();
@@ -252,13 +262,14 @@ describe('Services', () => {
                 expect(type).toEqual(User);
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(response);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
-            store.save(users, params).subscribe((doc: any) => {
+            store.save(users, params, options).subscribe((doc: any) => {
                 expect(adapter.updateAll).toHaveBeenCalledTimes(1);
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
@@ -276,18 +287,20 @@ describe('Services', () => {
             user.id = '123';
 
             const params = { include: ['offices'] };
+            const options: Options = {path: "/custom"};
 
-            adapter.remove.and.callFake((type: any, id: any, reqParams: any) => {
+            adapter.remove.and.callFake((type: any, id: any, reqParams: any, opts: Options) => {
                 expect(type).toEqual(User);
                 expect(id).toEqual(user.id);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(null);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
-            store.remove(user, params).subscribe((doc: any) => {
+            store.remove(user, params, options).subscribe((doc: any) => {
                 expect(adapter.remove).toHaveBeenCalledTimes(1);
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
@@ -304,10 +317,11 @@ describe('Services', () => {
 
             const users = [user1, user2];
             const params = { include: ['offices'] };
+            const options: Options = {path: "/custom"};
 
             spyOn(serializer, 'serializeAsId').and.callThrough();
 
-            adapter.removeAll.and.callFake((type: any, payload: any, reqParams: any) => {
+            adapter.removeAll.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serializeAsId).toHaveBeenCalledTimes(1);
 
                 const serializerCall = (<any>serializer.serializeAsId).calls.mostRecent();
@@ -316,13 +330,14 @@ describe('Services', () => {
                 expect(type).toEqual(User);
                 expect(payload).toEqual(serializerCall.returnValue);
                 expect(reqParams).toEqual(params);
+                expect(opts).toEqual(options);
 
                 return of(null);
             });
 
             spyOn(serializer, 'deserialize').and.callThrough();
 
-            store.remove(users, params).subscribe((doc: any) => {
+            store.remove(users, params, options).subscribe((doc: any) => {
                 expect(adapter.removeAll).toHaveBeenCalledTimes(1);
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
