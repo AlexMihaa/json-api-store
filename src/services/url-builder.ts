@@ -22,6 +22,10 @@ export class JsonApiUrlBuilder {
         return this.baseUrl + JsonApiUrlBuilder.getResourcePath(resType);
     }
 
+    getCustomUrl(path: string): string {
+        return this.baseUrl + path;
+    }
+
     private static getResourcePath<T extends Resource>(resType: ResourceType<T>): string {
         const metadata = ModelMetadata.getClassMetadata(resType);
 

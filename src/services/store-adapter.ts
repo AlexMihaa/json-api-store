@@ -21,6 +21,7 @@ import {
     ResourceType,
     ResponseInterceptor
 } from '../contracts';
+import {Options} from "./store";
 
 
 @Injectable()
@@ -111,20 +112,39 @@ export class JsonApiStoreAdapter {
         return this;
     }
 
-    get<T extends Resource>(resType: ResourceType<T>, id: string, params?: any): Observable<ApiDocument> {
-        const url = this.urlBuilder.getResourceUrl(resType, id);
+    get<T extends Resource>(
+        resType: ResourceType<T>, id: string, params?: any, options?: Options
+    ): Observable<ApiDocument> {
+        let url: string;
+        if (options && options.path) {
+            url = this.urlBuilder.getCustomUrl(options.path);
+        } else {
+            url = this.urlBuilder.getResourceUrl(resType, id);
+        }
 
         return this.sendRequest(resType, url, "GET", params);
     }
 
-    getList<T extends Resource>(resType: ResourceType<T>, params?: any): Observable<ApiDocument> {
-        const url = this.urlBuilder.getResourceListUrl(resType);
+    getList<T extends Resource>(resType: ResourceType<T>, params?: any, options?: Options): Observable<ApiDocument> {
+        let url:string;
+        if (options && options.path) {
+            url = this.urlBuilder.getCustomUrl(options.path)
+        } else {
+            url = this.urlBuilder.getResourceListUrl(resType);
+        }
 
         return this.sendRequest(resType, url, "GET", params);
     }
 
-    create<T extends Resource>(resType: ResourceType<T>, payload: ApiDocument, params?: any): Observable<ApiDocument> {
-        const url = this.urlBuilder.getResourceListUrl(resType);
+    create<T extends Resource>(
+        resType: ResourceType<T>, payload: ApiDocument, params?: any, options?: Options
+    ): Observable<ApiDocument> {
+        let url: string;
+        if (options && options.path) {
+            url = this.urlBuilder.getCustomUrl(options.path);
+        } else {
+            url = this.urlBuilder.getResourceListUrl(resType);
+        }
 
         return this.sendRequest(resType, url, "POST", params, payload);
     }
@@ -133,9 +153,15 @@ export class JsonApiStoreAdapter {
         resType: ResourceType<T>,
         id: string,
         payload: ApiDocument,
-        params?: any
+        params?: any,
+        options?: Options
     ): Observable<ApiDocument> {
-        const url = this.urlBuilder.getResourceUrl(resType, id);
+        let url: string;
+        if (options && options.path) {
+            url = this.urlBuilder.getCustomUrl(options.path);
+        } else {
+            url = this.urlBuilder.getResourceUrl(resType, id);
+        }
 
         return this.sendRequest(resType, url, "PATCH", params, payload);
     }
@@ -143,15 +169,28 @@ export class JsonApiStoreAdapter {
     updateAll<T extends Resource>(
         resType: ResourceType<T>,
         payload: ApiDocument,
-        params?: any
+        params?: any,
+        options?: Options
     ): Observable<ApiDocument> {
-        const url = this.urlBuilder.getResourceListUrl(resType);
+        let url: string;
+        if (options && options.path) {
+            url = this.urlBuilder.getCustomUrl(options.path);
+        } else {
+            url = this.urlBuilder.getResourceListUrl(resType);
+        }
 
         return this.sendRequest(resType, url, "PATCH", params, payload);
     }
 
-    remove<T extends Resource>(resType: ResourceType<T>, id: string, params?: any): Observable<ApiDocument> {
-        const url = this.urlBuilder.getResourceUrl(resType, id);
+    remove<T extends Resource>(
+        resType: ResourceType<T>, id: string, params?: any, options?: Options
+    ): Observable<ApiDocument> {
+        let url: string;
+        if (options && options.path) {
+            url = this.urlBuilder.getCustomUrl(options.path);
+        } else {
+            url = this.urlBuilder.getResourceUrl(resType, id);
+        }
 
         return this.sendRequest(resType, url, "DELETE", params);
     }
@@ -159,9 +198,15 @@ export class JsonApiStoreAdapter {
     removeAll<T extends Resource>(
         resType: ResourceType<T>,
         payalod: ApiDocument,
-        params?: any
+        params?: any,
+        options?: Options
     ): Observable<ApiDocument> {
-        const url = this.urlBuilder.getResourceListUrl(resType);
+        let url: string;
+        if (options && options.path) {
+            url = this.urlBuilder.getCustomUrl(options.path)
+        } else {
+            url = this.urlBuilder.getResourceListUrl(resType);
+        }
 
         return this.sendRequest(resType, url, "DELETE", params, payalod);
     }
@@ -244,6 +289,7 @@ export class JsonApiStoreAdapter {
         resType: ResourceType<T>,
         error: HttpErrorResponse
     ): Observable<ApiDocument> {
+
         if (this.errInterceptors.has('global')) {
             this.errInterceptors.get('global').forEach((interceptor: ErrorInterceptor) => {
                 interceptor(error);
@@ -256,15 +302,20 @@ export class JsonApiStoreAdapter {
             });
         }
 
-        let doc: ApiDocument = {
-            errors: [
-                {
-                    id: Math.random().toString(),
-                    status: error.status.toString(),
-                    title: error.statusText
-                }
-            ]
-        };
+        let doc: ApiDocument;
+        if (error.error) {
+            doc = error.error;
+        } else {
+            doc = {
+                errors: [
+                    {
+                        id: Math.random().toString(),
+                        status: error.status.toString(),
+                        title: error.statusText
+                    }
+                ]
+            };
+        }
 
         return throwError(doc);
     }

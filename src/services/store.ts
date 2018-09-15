@@ -8,30 +8,42 @@ import { JsonApiStoreAdapter } from './store-adapter';
 import { JsonApiDocument } from '../models';
 import { ResourceMetadata } from '../metadata';
 
+export interface Options {
+    path?: string;
+}
+
 @Injectable()
 export class JsonApiStore {
 
     constructor(private serializer: JsonApiDocumentSerializer, private adapter: JsonApiStoreAdapter) {}
 
-    get<T extends Resource>(resType: ResourceType<T>, id: string, params?: any): Observable<JsonApiDocument<T>> {
-        const request = this.adapter.get(resType, id, params);
+    get<T extends Resource>(
+        resType: ResourceType<T>, id: string, params?: any, options?: Options
+    ): Observable<JsonApiDocument<T>> {
+        const request = this.adapter.get(resType, id, params, options);
 
         return <Observable<JsonApiDocument<T>>>this.performRequest(request, resType);
     }
 
-    getList<T extends Resource>(resType: ResourceType<T>, params?: any): Observable<JsonApiDocument<T[]>> {
-        const request = this.adapter.getList(resType, params);
+    getList<T extends Resource>(
+        resType: ResourceType<T>, params?: any, options?: Options
+    ): Observable<JsonApiDocument<T[]>> {
+        const request = this.adapter.getList(resType, params, options);
 
         return <Observable<JsonApiDocument<T[]>>>this.performRequest(request, resType);
     }
 
-    save<T extends Resource>(resources: T|T[], params?: any): Observable<JsonApiDocument<T|T[]>> {
+    save<T extends Resource>(resources: T|T[], params?: any, options?: Options): Observable<JsonApiDocument<T|T[]>> {
         const resType = this.getResourceType(resources);
 
         try {
             const isNew = this.isNewResources(resources);
 
-            return (isNew) ? this.create(resType, resources, params) : this.update(resType, resources, params);
+            if (isNew) {
+                return this.create(resType, resources, params, options);
+            }
+
+            return this.update(resType, resources, params, options);
         } catch (e) {
             const doc: ApiDocument = {
                 errors: [{
@@ -45,7 +57,7 @@ export class JsonApiStore {
         }
     }
 
-    remove<T extends Resource>(resource: T|T[], params?: any): Observable<JsonApiDocument<T|T[]>> {
+    remove<T extends Resource>(resource: T|T[], params?: any, options?: Options): Observable<JsonApiDocument<T|T[]>> {
         const resType = this.getResourceType(resource);
 
         let request: Observable<ApiDocument>;
@@ -53,10 +65,11 @@ export class JsonApiStore {
             request = this.adapter.removeAll(
                 resType,
                 this.serializer.serializeAsId(resource),
-                params
+                params,
+                options
             );
         } else {
-            request = this.adapter.remove(resType, resource.id, params);
+            request = this.adapter.remove(resType, resource.id, params, options);
         }
 
         return this.performRequest(request, resType);
@@ -105,25 +118,27 @@ export class JsonApiStore {
     private create<T extends Resource>(
         resType: ResourceType<T>,
         resources: T[] | T,
-        params?: any
+        params?: any,
+        options?: Options
     ): Observable<JsonApiDocument<T|T[]>> {
         const payload = this.serializer.serialize(resources);
 
-        return this.performRequest(this.adapter.create(resType, payload, params), resType);
+        return this.performRequest(this.adapter.create(resType, payload, params, options), resType);
     }
 
     private update<T extends Resource>(
         resType: ResourceType<T>,
         resources: T[] | T,
-        params: any
+        params: any,
+        options: Options
     ): Observable<JsonApiDocument<T|T[]>> {
         const payload = this.serializer.serialize(resources);
 
         let request: Observable<ApiDocument>;
         if (Array.isArray(resources)) {
-            request = this.adapter.updateAll(resType, payload, params);
+            request = this.adapter.updateAll(resType, payload, params, options);
         } else {
-            request = this.adapter.update(resType, resources.id, payload, params);
+            request = this.adapter.update(resType, resources.id, payload, params, options);
         }
 
         return this.performRequest(request, resType);
