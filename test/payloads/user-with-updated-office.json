@@ -1,0 +1,15 @@
+{
+  "type": "users",
+  "id": "test-user",
+  "relationships": {
+    "office": {
+      "data": {
+        "type": "offices",
+        "id": "test-office",
+        "attributes": {
+          "title": "New office title"
+        }
+      }
+    }
+  }
+}

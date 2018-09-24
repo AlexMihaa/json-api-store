@@ -157,7 +157,8 @@ export class JsonApiResourceSerializer {
 
     private serializeRelationshipItem(item: Resource, metadata: ModelMetadata): ApiResource|ApiResourceId {
         const instMeta = ResourceMetadata.getMetadata(item);
-        if ((!instMeta) || (false === instMeta.isNew) || (false === instMeta.hasChanges)) {
+
+        if ((!instMeta) || (false === instMeta.hasChanges && false === instMeta.isNew)) {
             return this.serializeAsId(item, metadata);
         }
 

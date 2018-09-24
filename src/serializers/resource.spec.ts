@@ -71,6 +71,20 @@ describe('JsonApiResourceSerializer', () => {
         expect(payload).toEqual(expected);
     });
 
+    it('should serialize resource with updated relationship', () => {
+        user.id = "test-user";
+        user.office.id = "test-office";
+        ResourceMetadata.flushMetadata(user);
+
+        user.office.title = 'New office title';
+
+        const payload = serializer.serialize(user, metadata);
+        console.log(payload);
+        const expected = require('../../test/payloads/user-with-updated-office.json');
+
+        expect(payload).toEqual(expected);
+    });
+
     it('should serialize resources without changes', () => {
         user.id = 'test';
         ResourceMetadata.flushMetadata(user);
