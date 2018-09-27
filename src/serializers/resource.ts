@@ -168,7 +168,7 @@ export class JsonApiResourceSerializer {
     private deserializeAttributes(resource: any, data: any, metadata: ModelMetadata) {
         metadata.getAttributes().forEach((attrMeta: AttributeMetadata) => {
             const field = (attrMeta.field) ? attrMeta.field : attrMeta.property;
-            if (!data[field]) {
+            if (!(field in data)) {
                 return;
             }
 
