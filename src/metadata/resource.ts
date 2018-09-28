@@ -44,7 +44,7 @@ export class ResourceMetadata {
 
     updateField(field: string, value: any): ResourceMetadata {
         if (!this._fields[field]) {
-            this._fields[field] = {value: value, initial: undefined};
+            this._fields[field] = {value: value, initial: null};
         } else {
             this._fields[field].value = value;
         }

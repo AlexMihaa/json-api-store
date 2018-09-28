@@ -58,16 +58,17 @@ export class JsonApiResourceSerializer {
     }
 
     private serializeAttributes(resource: Resource, metadata: ModelMetadata): {[key: string]: any} {
+        const instMetadata = ResourceMetadata.getMetadata(resource);
+        if (!instMetadata) {
+            return null
+        }
+
         let count:number = 0;
         const attributes: {[key: string]: any} = {};
 
-        const instMetadata = ResourceMetadata.getMetadata(resource);
 
         metadata.getAttributes().forEach((attrMetadata: AttributeMetadata) => {
-            if ((instMetadata) &&
-                (false === instMetadata.isNew) &&
-                (false === instMetadata.isChanged(attrMetadata.property))
-            ) {
+            if (!instMetadata.isChanged(attrMetadata.property)) {
                 return;
             }
 
