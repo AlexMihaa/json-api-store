@@ -1,9 +1,5 @@
 {
   "type": "users",
-  "attributes": {
-    "email": null,
-    "name": null
-  },
   "relationships": {
     "office": {"data": {"type": "offices", "id": "test"}},
     "roles": {"data": []}

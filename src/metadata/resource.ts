@@ -74,7 +74,7 @@ export class ResourceMetadata {
         return true;
     }
 
-    flush(): ResourceMetadata {
+    flush(isNew: boolean = false, recursive: boolean = true): ResourceMetadata {
         this._isNew = false;
         Object.keys(this._fields).forEach((field) => {
             if (this._fields[field].value instanceof Array) {
@@ -83,11 +83,11 @@ export class ResourceMetadata {
                 this._fields[field].initial = this._fields[field].value;
             }
 
-            if (ResourceMetadata.isResource(this._fields[field].initial)) {
+            if (ResourceMetadata.isResource(this._fields[field].initial) && recursive) {
                 ResourceMetadata.flushMetadata(this._fields[field].initial);
             } else if (this._fields[field].initial instanceof Array) {
                 this._fields[field].initial.forEach((cur: any) => {
-                    if (ResourceMetadata.isResource(cur)) {
+                    if (ResourceMetadata.isResource(cur) && recursive) {
                         ResourceMetadata.flushMetadata(cur);
                     }
                 });

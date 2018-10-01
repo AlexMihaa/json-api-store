@@ -79,7 +79,6 @@ describe('JsonApiResourceSerializer', () => {
         user.office.title = 'New office title';
 
         const payload = serializer.serialize(user, metadata);
-        console.log(payload);
         const expected = require('../../test/payloads/user-with-updated-office.json');
 
         expect(payload).toEqual(expected);
