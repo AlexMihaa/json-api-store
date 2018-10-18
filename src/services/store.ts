@@ -81,7 +81,14 @@ export class JsonApiStore {
     ): Observable<JsonApiDocument<T|T[]>> {
         return request.pipe(
             map((data: ApiDocument) => this.serializer.deserialize(data, resType)),
-            catchError((error: ApiDocument) => {
+            catchError((error: ApiDocument|Error) => {
+                if (error instanceof Error) {
+                    const doc = new JsonApiDocument<T|T[]>();
+                    doc.errors = [{title: error.message}];
+
+                    return throwError(doc);
+                }
+
                 return throwError(this.serializer.deserialize(error, resType));
             })
         );

@@ -242,6 +242,10 @@ export class JsonApiResourceSerializer {
             this.deserialize(data, modelType, context);
         }
 
+        if (!context.hasResource(data.type, data.id)) {
+            throw new Error(`Context doesn't contain resource with type '${data.type}' and ID '${data.id}'`);
+        }
+
         return context.getResource(data.type, data.id);
     }
 }

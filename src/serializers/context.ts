@@ -7,7 +7,7 @@ export class SerializationContext {
     }
 
     hasResource(type: string, id: string): boolean {
-        return !!(this.resources[type] && this.resources[type][id]);
+        return !!this.resources[type] && !!this.resources[type][id];
     }
 
     addResource(type: string, id: string, resource: any) {
@@ -23,7 +23,7 @@ export class SerializationContext {
     }
 
     hasLinkedData(type: string, id: string): boolean {
-        return !!(this.linked[type] && this.linked[type][id]);
+        return !!this.linked[type] && !!this.linked[type][id];
     }
 
     getLinkedData(type: string, id: string): any {
