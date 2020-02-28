@@ -1,5 +1,5 @@
-import { ModelConfiguration } from '../contracts';
-import { ModelMetadata } from '../metadata';
+import { ModelConfiguration, ResourceType } from '../contracts';
+import { ModelMetadata, Registry } from '../metadata';
 
 export const METADATA_KEY = 'JsonApiResource';
 export const METADATA_PROPERTY = '__apiMetadata';
@@ -26,6 +26,9 @@ export function Model(config?: ModelConfiguration): ClassDecorator {
             if (config.type) {
                 metadata.type = config.type;
             }
+
+            metadata.discField = config.discField;
+            metadata.discMap = config.discMap;
             metadata.path = config.path;
         }
 
@@ -34,5 +37,9 @@ export function Model(config?: ModelConfiguration): ClassDecorator {
         }
 
         (Reflect as any).defineMetadata(METADATA_KEY, metadata, target);
+
+        const modelId = (config && config.id) ? config.id : target.name;
+
+        Registry.register(modelId, <ResourceType<any>>target);
     };
 }

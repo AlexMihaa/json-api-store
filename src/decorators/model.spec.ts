@@ -4,11 +4,21 @@ import { Attribute } from './attribute';
 
 describe('Decorators', () => {
     describe('Model', () => {
-        @Model({type: 'parent'})
+        @Model({
+            type: 'parent',
+            discField: 'subType',
+            discMap: {
+                'first': 'ChildResource',
+                'second': 'com.test.SecondChild'
+            }
+        })
         class ParentResource {
 
             @Attribute()
             name: string;
+
+            @Attribute()
+            subType: string;
         }
 
         @Model({path: '/test-children'})
@@ -18,7 +28,7 @@ describe('Decorators', () => {
             title: string;
         }
 
-        @Model({type: 'child'})
+        @Model({id: 'com.test.SecondChild', type: 'child'})
         class SecondChildResource extends ParentResource {
 
         }

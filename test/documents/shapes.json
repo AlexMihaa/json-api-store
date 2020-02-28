@@ -1,0 +1,21 @@
+{
+  "data": [
+      {
+          "id": "rectangle1",
+          "type": "shapes",
+          "attributes": {
+              "shapeType": "rectangle",
+              "width": 100,
+              "height": 80
+          }
+      },
+      {
+          "id": "circle1",
+          "type": "shapes",
+          "attributes": {
+              "shapeType": "circle",
+              "radius": 50
+          }
+      }
+  ]
+}

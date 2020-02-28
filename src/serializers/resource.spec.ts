@@ -14,7 +14,6 @@ import { CorruptedResource } from '../../test/models/corrupted.model';
 import { Post } from '../../test/models/post.model';
 
 describe('JsonApiResourceSerializer', () => {
-    const metadata = ModelMetadata.getClassMetadata(User);
 
     let serializer: JsonApiResourceSerializer;
     let user: User;
@@ -51,7 +50,7 @@ describe('JsonApiResourceSerializer', () => {
     });
 
     it('should serialize new resources', () => {
-        const result: any = serializer.serialize(user, metadata);
+        const result: any = serializer.serialize(user);
 
         const expected = require('../../test/payloads/new-user.json');
 
@@ -64,7 +63,7 @@ describe('JsonApiResourceSerializer', () => {
 
         user.email = 'test2@test.com';
 
-        const payload = serializer.serialize(user, metadata);
+        const payload = serializer.serialize(user);
 
         const expected = require('../../test/payloads/updated-user.json');
 
@@ -78,7 +77,7 @@ describe('JsonApiResourceSerializer', () => {
 
         user.office.title = 'New office title';
 
-        const payload = serializer.serialize(user, metadata);
+        const payload = serializer.serialize(user);
         const expected = require('../../test/payloads/user-with-updated-office.json');
 
         expect(payload).toEqual(expected);
@@ -88,7 +87,7 @@ describe('JsonApiResourceSerializer', () => {
         user.id = 'test';
         ResourceMetadata.flushMetadata(user);
 
-        const payload = serializer.serialize(user, metadata);
+        const payload = serializer.serialize(user);
 
         const expected = require('../../test/payloads/user-without-changes.json');
 
@@ -97,7 +96,7 @@ describe('JsonApiResourceSerializer', () => {
 
     it('should serialize new empty resources', () => {
         const testUser = new User();
-        const payload = serializer.serialize(testUser, metadata);
+        const payload = serializer.serialize(testUser);
 
         const expected = require('../../test/payloads/empty-user.json');
 
@@ -112,7 +111,7 @@ describe('JsonApiResourceSerializer', () => {
         const newUser = new User();
         newUser.office = office;
 
-        const payload = serializer.serialize(newUser, metadata);
+        const payload = serializer.serialize(newUser);
 
         const expected = require('../../test/payloads/user-with-existing-office.json');
 
@@ -128,7 +127,7 @@ describe('JsonApiResourceSerializer', () => {
         const resource = new CustomAttributeResource();
         resource.name = 'TEST';
 
-        const payload = serializer.serialize(resource, modelMetadata);
+        const payload = serializer.serialize(resource);
 
         expect(attrSerializer.serialize).toHaveBeenCalledWith(resource.name);
 
@@ -145,10 +144,7 @@ describe('JsonApiResourceSerializer', () => {
         obj.title = 'test';
         obj.customer = user;
 
-        const payload: ApiResource = serializer.serialize(
-            obj,
-            ModelMetadata.getClassMetadata(CustomFieldsResource)
-        );
+        const payload: ApiResource = serializer.serialize(obj);
 
         const expected = require('../../test/payloads/custom-fields.json');
 

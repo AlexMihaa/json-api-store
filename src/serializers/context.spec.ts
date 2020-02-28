@@ -17,7 +17,7 @@ describe('SerializationContext', () => {
         expect(context.hasResource('test', 'test')).toBeFalsy();
 
         const resource = {type: 'test', id: 'test', name: 'Test resource'};
-        context.addResource(resource.type, resource.id, resource);
+        context.addResource(resource.type, resource);
 
         expect(context.hasResource(resource.type, resource.id)).toBeTruthy();
         expect(context.getResource(resource.type, resource.id)).toBe(resource);

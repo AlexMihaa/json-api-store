@@ -10,12 +10,12 @@ export class SerializationContext {
         return !!this.resources[type] && !!this.resources[type][id];
     }
 
-    addResource(type: string, id: string, resource: any) {
+    addResource(type: string, resource: any) {
         if (!this.resources[type]) {
             this.resources[type] = {};
         }
 
-        this.resources[type][id] = resource;
+        this.resources[type][resource.id] = resource;
     }
 
     getResource(type: string, id: string): any {

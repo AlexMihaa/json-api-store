@@ -14,15 +14,14 @@ export class JsonApiDocumentSerializer {
     serialize<T extends Resource>(resources: T|T[]): ApiDocument {
         const doc: ApiDocument = {};
 
-        const metadata = ModelMetadata.getObjectMetadata(resources);
         if (Array.isArray(resources)) {
             doc.data = [];
 
             resources.forEach((resource: T) => {
-                (<ApiResource[]>doc.data).push(this.resSerializer.serialize(resource, metadata));
+                (<ApiResource[]>doc.data).push(this.resSerializer.serialize(resource));
             });
         } else {
-            doc.data = this.resSerializer.serialize(resources, metadata);
+            doc.data = this.resSerializer.serialize(resources);
         }
 
         return doc;

@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 
-import { ModelMetadata, ResourceMetadata, AttributeMetadata, RelationshipMetadata } from '../metadata';
+import { ModelMetadata, ResourceMetadata, AttributeMetadata, RelationshipMetadata, Registry } from '../metadata';
 import { Resource, ResourceType, ApiResource, ApiResourceId, ApiRelationship } from '../contracts';
 import { SerializationContext } from './context';
 
 @Injectable()
 export class JsonApiResourceSerializer {
 
-    serialize<T extends Resource>(resource: T, metadata: ModelMetadata): ApiResource {
+    serialize<T extends Resource>(resource: T): ApiResource {
+        const metadata = ModelMetadata.getObjectMetadata(resource);
+
         const payload: ApiResource = {
             type: metadata.type
         };
@@ -40,8 +42,17 @@ export class JsonApiResourceSerializer {
     ): T {
         const metadata = ModelMetadata.getClassMetadata(modelType);
 
+        if (metadata.discField) {
+            const discVal = this.deserializeAttribute(data.attributes, metadata.getAttribute(metadata.discField));
+            if (discVal && metadata.discMap && metadata.discMap[discVal]) {
+                return this.deserialize(data, Registry.get(metadata.discMap[discVal]), context);
+            }
+        }
+
         const resource = new modelType();
         resource.id = data.id;
+
+        context.addResource(metadata.type, resource);
 
         if (data.attributes && data.attributes instanceof Object) {
             this.deserializeAttributes(resource, data.attributes, metadata);
@@ -52,7 +63,7 @@ export class JsonApiResourceSerializer {
         }
 
         ResourceMetadata.flushMetadata(resource);
-        context.addResource(metadata.type, resource.id, resource);
+
 
         return resource;
     }
@@ -68,7 +79,7 @@ export class JsonApiResourceSerializer {
 
 
         metadata.getAttributes().forEach((attrMetadata: AttributeMetadata) => {
-            if (!instMetadata.isChanged(attrMetadata.property)) {
+            if (metadata.discField !== attrMetadata.field && !instMetadata.isChanged(attrMetadata.property)) {
                 return;
             }
 
@@ -121,7 +132,8 @@ export class JsonApiResourceSerializer {
         }
 
         const value = instMeta.getFieldValue(relMeta.property);
-        const metadata = ModelMetadata.getClassMetadata(relMeta.resource);
+        const res = (typeof relMeta.resource === 'string') ? Registry.get(relMeta.resource) : relMeta.resource;
+        const metadata = ModelMetadata.getClassMetadata(res);
 
         if (relMeta.isArray) {
             return this.serializeHasMany(value, metadata);
@@ -163,7 +175,7 @@ export class JsonApiResourceSerializer {
             return this.serializeAsId(item, metadata);
         }
 
-        return this.serialize(item, metadata);
+        return this.serialize(item);
     }
 
     private deserializeAttributes(resource: any, data: any, metadata: ModelMetadata) {
@@ -175,6 +187,15 @@ export class JsonApiResourceSerializer {
 
             resource[attrMeta.property] = (attrMeta.serializer) ? attrMeta.serializer.deserialize(data[field]) : data[field];
         });
+    }
+
+    private deserializeAttribute(data: any, metadata: AttributeMetadata): any {
+        const field = (metadata.field) ? metadata.field : metadata.property;
+        if (!(field in data)) {
+            return;
+        }
+
+        return (metadata.serializer) ? metadata.serializer.deserialize(data[field]) : data[field];
     }
 
     private deserializeRelationships(
@@ -190,10 +211,11 @@ export class JsonApiResourceSerializer {
             }
 
             let parsedValue: Resource|Resource[];
+            const res = (typeof relMeta.resource === 'string') ? Registry.get(relMeta.resource) : relMeta.resource;
             if (relMeta.isArray) {
-                parsedValue = this.deserializeRelationshipItems(data[field].data, relMeta.resource, context);
+                parsedValue = this.deserializeRelationshipItems(data[field].data, res, context);
             } else {
-                parsedValue = this.deserializeRelationshipItem(data[field].data, relMeta.resource, context);
+                parsedValue = this.deserializeRelationshipItem(data[field].data, res, context);
             }
 
             resource[relMeta.property] = parsedValue;

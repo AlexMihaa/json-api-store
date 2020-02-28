@@ -7,7 +7,7 @@ export interface RelationshipConfiguration {
     /**
      * Resource type for relationship
      */
-    resource: ResourceType<any>;
+    resource: ResourceType<any> | string;
 
     /**
      * Resource field name if it doesn't match with property name

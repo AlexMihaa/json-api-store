@@ -3,6 +3,11 @@
  */
 export interface ModelConfiguration {
     /**
+     * Unique model ID. If not specified Model name will be used.
+     */
+    id?: string;
+
+    /**
      * Resource type
      */
     type?: string;
@@ -10,7 +15,12 @@ export interface ModelConfiguration {
     /**
      * Name of the property that store value for discriminator
      */
-    discriminator?: string;
+    discField?: string;
+
+    /**
+     * Discriminator map
+     */
+    discMap?: {[key: string]: string};
 
     /**
      * Path to resources on server if it doesn't match to resource type

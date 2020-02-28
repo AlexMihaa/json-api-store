@@ -3,5 +3,5 @@ import { ResourceType } from '../contracts/models/resource-type';
 
 export class RelationshipMetadata extends FieldMetadata {
     isArray: boolean = false;
-    resource: ResourceType<any>;
+    resource: ResourceType<any> | string;
 }

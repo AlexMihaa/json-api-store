@@ -7,6 +7,8 @@ import { Resource } from '../contracts/models/resource';
 export class ModelMetadata {
     public type: string;
     public path: string;
+    public discField: string;
+    public discMap: {[key: string]: string};
     private attributes: AttributeMetadata[] = [];
     private relationships: RelationshipMetadata[] = [];
 

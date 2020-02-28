@@ -1,11 +1,12 @@
 import { JsonApiResourceSerializer } from './resource';
 import { JsonApiDocumentSerializer } from './document';
 import { User } from '../../test/models/user.model';
-import { ModelMetadata } from '../metadata/model';
 import { ApiDocument } from '../contracts/api/document';
 import { JsonApiDocument } from '../models/document';
 import { SerializationContext } from './context';
 import { ApiResource } from '../contracts/api/resource';
+import { Rectangle } from '../../test/models/rectangle.model';
+import { Circle } from '../../test/models/circle.model';
 
 describe('JsonApiDocumentSerializer', () => {
 
@@ -20,15 +21,13 @@ describe('JsonApiDocumentSerializer', () => {
     it('should serialize single resource', () => {
         spyOn(resSerializer, 'serialize').and.callThrough();
 
-        const metadata = ModelMetadata.getClassMetadata(User);
-
         const user = new User();
         user.email = 'test@test.com';
         user.name = 'Test user';
 
         const doc = docSerializer.serialize(user);
 
-        expect(resSerializer.serialize).toHaveBeenCalledWith(user, metadata);
+        expect(resSerializer.serialize).toHaveBeenCalledWith(user);
 
         const expected = require('../../test/documents/create-user.json');
 
@@ -37,8 +36,6 @@ describe('JsonApiDocumentSerializer', () => {
 
     it('should serialize array of resources', () => {
         spyOn(resSerializer, 'serialize').and.callThrough();
-
-        const metadata = ModelMetadata.getClassMetadata(User);
 
         const user1 = new User();
         user1.email = 'test1@test.com';
@@ -50,12 +47,34 @@ describe('JsonApiDocumentSerializer', () => {
 
         const doc = docSerializer.serialize([user1, user2]);
 
-        expect(resSerializer.serialize).toHaveBeenCalledWith(user1, metadata);
-        expect(resSerializer.serialize).toHaveBeenCalledWith(user2, metadata);
+        expect(resSerializer.serialize).toHaveBeenCalledWith(user1);
+        expect(resSerializer.serialize).toHaveBeenCalledWith(user2);
 
         const expected = require('../../test/documents/create-users.json');
 
         expect(doc).toEqual(expected);
+    });
+
+    it('should serialize array of resources that have discriminator', () => {
+        spyOn(resSerializer, 'serialize').and.callThrough();
+
+        const rectangle = new Rectangle();
+        rectangle.id = 'rectangle1';
+        rectangle.width = 100;
+        rectangle.height = 80;
+
+        const circle = new Circle();
+        circle.id = 'circle1'
+        circle.radius = 50;
+
+        const doc = docSerializer.serialize([rectangle, circle]);
+
+        expect(resSerializer.serialize).toHaveBeenCalledWith(rectangle);
+        expect(resSerializer.serialize).toHaveBeenCalledWith(circle);
+
+        const expDoc = require('../../test/documents/shapes.json');
+
+        expect(doc).toEqual(expDoc);
     });
 
     it('should deserialize response with single resource', () => {
