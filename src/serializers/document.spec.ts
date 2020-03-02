@@ -7,6 +7,7 @@ import { SerializationContext } from './context';
 import { ApiResource } from '../contracts/api/resource';
 import { Rectangle } from '../../test/models/rectangle.model';
 import { Circle } from '../../test/models/circle.model';
+import { Shape } from '../../test/models/shape.model';
 
 describe('JsonApiDocumentSerializer', () => {
 
@@ -64,7 +65,7 @@ describe('JsonApiDocumentSerializer', () => {
         rectangle.height = 80;
 
         const circle = new Circle();
-        circle.id = 'circle1'
+        circle.id = 'circle1';
         circle.radius = 50;
 
         const doc = docSerializer.serialize([rectangle, circle]);
@@ -129,6 +130,30 @@ describe('JsonApiDocumentSerializer', () => {
         expect(docData[1]).toEqual(user2);
 
         expect(doc.meta).toEqual(data.meta);
+    });
+
+    it('should deserialize response with several resources and discriminator', () => {
+        const data: any = require('../../test/documents/shapes.json');
+
+        const doc = docSerializer.deserialize(data, Shape);
+
+        expect(doc instanceof JsonApiDocument).toBeTruthy();
+
+        const docData: any[] = <Shape[]>doc.data;
+        expect(Array.isArray(docData)).toBeTruthy();
+        expect(docData.length).toEqual(2);
+
+        expect(docData[0] instanceof Rectangle).toBeTruthy();
+        expect(docData[0].id).toEqual(data.data[0].id);
+        expect(docData[0].shapeType).toEqual(data.data[0].attributes.shapeType);
+        expect(docData[0].width).toEqual(data.data[0].attributes.width);
+        expect(docData[0].height).toEqual(data.data[0].attributes.height);
+
+
+        expect(docData[1] instanceof Circle).toBeTruthy();
+        expect(docData[1].id).toEqual(data.data[1].id);
+        expect(docData[1].shapeType).toEqual(data.data[1].attributes.shapeType);
+        expect(docData[1].radius).toEqual(data.data[1].attributes.radius);
     });
 
     it('should deserialize response with errors', () => {

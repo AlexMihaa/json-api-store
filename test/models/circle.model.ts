@@ -1,7 +1,7 @@
 import { Shape } from './shape.model';
 import { Attribute, Model } from '../../src/decorators';
 
-@Model()
+@Model({id: 'com.test.circle'})
 export class Circle extends Shape {
 
     @Attribute()
