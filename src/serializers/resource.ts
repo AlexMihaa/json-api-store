@@ -191,7 +191,7 @@ export class JsonApiResourceSerializer {
 
     private deserializeAttribute(data: any, metadata: AttributeMetadata): any {
         const field = (metadata.field) ? metadata.field : metadata.property;
-        if (!(field in data)) {
+        if (!data || !(field in data)) {
             return;
         }
 
