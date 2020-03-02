@@ -10,6 +10,7 @@ import { ResourceMetadata } from '../metadata';
 
 export interface Options {
     path?: string;
+    respType?: ResourceType<any>
 }
 
 @Injectable()
@@ -22,7 +23,7 @@ export class JsonApiStore {
     ): Observable<JsonApiDocument<T>> {
         const request = this.adapter.get(resType, id, params, options);
 
-        return <Observable<JsonApiDocument<T>>>this.performRequest(request, resType);
+        return <Observable<JsonApiDocument<T>>>this.performRequest(request, resType, options);
     }
 
     getList<T extends Resource>(
@@ -30,7 +31,7 @@ export class JsonApiStore {
     ): Observable<JsonApiDocument<T[]>> {
         const request = this.adapter.getList(resType, params, options);
 
-        return <Observable<JsonApiDocument<T[]>>>this.performRequest(request, resType);
+        return <Observable<JsonApiDocument<T[]>>>this.performRequest(request, resType, options);
     }
 
     save<T extends Resource>(resources: T|T[], params?: any, options?: Options): Observable<JsonApiDocument<T|T[]>> {
@@ -53,7 +54,7 @@ export class JsonApiStore {
                 }]
             };
 
-            return this.performRequest(throwError(doc), resType);
+            return this.performRequest(throwError(doc), resType, options);
         }
     }
 
@@ -72,15 +73,18 @@ export class JsonApiStore {
             request = this.adapter.remove(resType, resource.id, params, options);
         }
 
-        return this.performRequest(request, resType);
+        return this.performRequest(request, resType, options);
     }
 
     private performRequest<T extends Resource>(
         request: Observable<ApiDocument>,
-        resType: ResourceType<T>
+        resType: ResourceType<T>,
+        options?: Options
     ): Observable<JsonApiDocument<T|T[]>> {
         return request.pipe(
-            map((data: ApiDocument) => this.serializer.deserialize(data, resType)),
+            map((data: ApiDocument) => {
+                return this.serializer.deserialize(data, this.getRespType(resType, options));
+            }),
             catchError((error: ApiDocument|Error) => {
                 if (error instanceof Error) {
                     const doc = new JsonApiDocument<T|T[]>();
@@ -89,7 +93,7 @@ export class JsonApiStore {
                     return throwError(doc);
                 }
 
-                return throwError(this.serializer.deserialize(error, resType));
+                return throwError(this.serializer.deserialize(error, this.getRespType(resType, options)));
             })
         );
     }
@@ -130,7 +134,7 @@ export class JsonApiStore {
     ): Observable<JsonApiDocument<T|T[]>> {
         const payload = this.serializer.serialize(resources);
 
-        return this.performRequest(this.adapter.create(resType, payload, params, options), resType);
+        return this.performRequest(this.adapter.create(resType, payload, params, options), resType, options);
     }
 
     private update<T extends Resource>(
@@ -148,6 +152,14 @@ export class JsonApiStore {
             request = this.adapter.update(resType, resources.id, payload, params, options);
         }
 
-        return this.performRequest(request, resType);
+        return this.performRequest(request, resType, options);
+    }
+
+    private getRespType<T extends Resource>(resType: ResourceType<T>, options?: Options): ResourceType<T> {
+        if (options && options.respType) {
+            return options.respType;
+        }
+
+        return resType;
     }
 }
