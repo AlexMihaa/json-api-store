@@ -1,0 +1,30 @@
+{
+  "data": {
+    "id": "1",
+    "type": "ad-positions",
+    "attributes": {
+      "code": "some advertising code",
+      "description": "Advertising Position #1",
+      "position": 1,
+      "weight": 10,
+      "status": "active"
+    },
+    "relationships": {
+      "adSet": {"data": {"id":  "1", "type": "ad-sets"}}
+    }
+  },
+  "included": [
+    {
+      "id": "1",
+      "type": "ad-sets",
+      "attributes": {
+        "name": "Test advertising set"
+      },
+      "relationships": {
+        "positions": {
+          "data": [{"id":  "1", "type":  "ad-positions"}]
+        }
+      }
+    }
+  ]
+}

@@ -8,10 +8,13 @@ import { ResourceMetadata } from '../metadata/resource';
 
 import { ApiResource } from '../contracts/api/resource';
 import { ApiDocument } from '../contracts/api/document';
-import { SerializationContext } from './context';
+import { DeserializationContext } from './deserialization-context';
 import { CustomAttributeResource } from '../../test/models/custom-attribute.model';
 import { CorruptedResource } from '../../test/models/corrupted.model';
 import { Post } from '../../test/models/post.model';
+import { AdSet } from '../../test/models/ad-set.model';
+import { AdPosition } from '../../test/models/ad-position.model';
+import { SerializationContext } from './serialization-context';
 
 describe('JsonApiResourceSerializer', () => {
 
@@ -50,7 +53,7 @@ describe('JsonApiResourceSerializer', () => {
     });
 
     it('should serialize new resources', () => {
-        const result: any = serializer.serialize(user);
+        const result: any = serializer.serialize(user, new SerializationContext());
 
         const expected = require('../../test/payloads/new-user.json');
 
@@ -63,7 +66,7 @@ describe('JsonApiResourceSerializer', () => {
 
         user.email = 'test2@test.com';
 
-        const payload = serializer.serialize(user);
+        const payload = serializer.serialize(user, new SerializationContext());
 
         const expected = require('../../test/payloads/updated-user.json');
 
@@ -77,7 +80,7 @@ describe('JsonApiResourceSerializer', () => {
 
         user.office.title = 'New office title';
 
-        const payload = serializer.serialize(user);
+        const payload = serializer.serialize(user, new SerializationContext());
         const expected = require('../../test/payloads/user-with-updated-office.json');
 
         expect(payload).toEqual(expected);
@@ -87,7 +90,7 @@ describe('JsonApiResourceSerializer', () => {
         user.id = 'test';
         ResourceMetadata.flushMetadata(user);
 
-        const payload = serializer.serialize(user);
+        const payload = serializer.serialize(user, new SerializationContext());
 
         const expected = require('../../test/payloads/user-without-changes.json');
 
@@ -96,7 +99,7 @@ describe('JsonApiResourceSerializer', () => {
 
     it('should serialize new empty resources', () => {
         const testUser = new User();
-        const payload = serializer.serialize(testUser);
+        const payload = serializer.serialize(testUser, new SerializationContext());
 
         const expected = require('../../test/payloads/empty-user.json');
 
@@ -111,7 +114,7 @@ describe('JsonApiResourceSerializer', () => {
         const newUser = new User();
         newUser.office = office;
 
-        const payload = serializer.serialize(newUser);
+        const payload = serializer.serialize(newUser, new SerializationContext());
 
         const expected = require('../../test/payloads/user-with-existing-office.json');
 
@@ -127,7 +130,7 @@ describe('JsonApiResourceSerializer', () => {
         const resource = new CustomAttributeResource();
         resource.name = 'TEST';
 
-        const payload = serializer.serialize(resource);
+        const payload = serializer.serialize(resource, new SerializationContext());
 
         expect(attrSerializer.serialize).toHaveBeenCalledWith(resource.name);
 
@@ -144,16 +147,39 @@ describe('JsonApiResourceSerializer', () => {
         obj.title = 'test';
         obj.customer = user;
 
-        const payload: ApiResource = serializer.serialize(obj);
+        const payload: ApiResource = serializer.serialize(obj, new SerializationContext());
 
         const expected = require('../../test/payloads/custom-fields.json');
 
         expect(payload).toEqual(expected);
     });
 
+    it('should serialize resources with cross-links', () => {
+        const adSet = new AdSet();
+        adSet.id = '1';
+        adSet.name = 'Test advertising set';
+
+        const adPosition = new AdPosition();
+        adPosition.id = '1';
+        adPosition.adSet = adSet;
+        adPosition.code = 'some advertising code';
+        adPosition.description = 'Advertising Position #1';
+        adPosition.position = 1;
+        adPosition.weight = 10;
+        adPosition.status = 'active';
+
+        adSet.positions = [adPosition];
+
+
+        const payload: ApiResource = serializer.serialize(adPosition, new SerializationContext());
+        const expected = require('../../test/payloads/ad-position.json');
+
+        expect(payload).toEqual(expected);
+    })
+
     it('should deserialize resource', () => {
         const doc: ApiDocument = require('../../test/documents/user.json');
-        const context = new SerializationContext(doc.included);
+        const context = new DeserializationContext(doc.included);
 
         const parsed = serializer.deserialize(<ApiResource>doc.data, User, context);
 
@@ -182,7 +208,7 @@ describe('JsonApiResourceSerializer', () => {
 
     it('should deserialize resource with sparse fieldset', () => {
         const doc: ApiDocument = require('../../test/documents/user-sparse-fieldset.json');
-        const context = new SerializationContext(doc.included);
+        const context = new DeserializationContext(doc.included);
 
         const parsed = serializer.deserialize(<ApiResource>doc.data, User, context);
 
@@ -203,7 +229,7 @@ describe('JsonApiResourceSerializer', () => {
 
     it('should deserialize resources with custom field name', () => {
         const doc: ApiDocument = require('../../test/documents/custom-fields.json');
-        const context = new SerializationContext(doc.included);
+        const context = new DeserializationContext(doc.included);
 
         const parsed = serializer.deserialize(<ApiResource>doc.data, CustomFieldsResource, context);
 
@@ -221,7 +247,7 @@ describe('JsonApiResourceSerializer', () => {
         spyOn(attrSerializer, 'deserialize').and.callThrough();
 
         const doc: ApiDocument = require('../../test/documents/custom-attribute.json');
-        const context = new SerializationContext(doc.included);
+        const context = new DeserializationContext(doc.included);
 
         const parsed = serializer.deserialize(<ApiResource>doc.data, CustomAttributeResource, context);
 
@@ -234,7 +260,7 @@ describe('JsonApiResourceSerializer', () => {
 
     it('should deserialize resources with corrupted relationships', () => {
         const doc: ApiDocument = require('../../test/documents/corrupted.json');
-        const context = new SerializationContext(doc.included);
+        const context = new DeserializationContext(doc.included);
 
         const parsed = serializer.deserialize(<ApiResource>doc.data, CorruptedResource, context);
 
@@ -248,7 +274,7 @@ describe('JsonApiResourceSerializer', () => {
 
     it('should deserialize resource and reuse the same objects for relationships', () => {
         const doc: ApiDocument = require('../../test/documents/post.json');
-        const context = new SerializationContext(doc.included);
+        const context = new DeserializationContext(doc.included);
 
         const parsed = serializer.deserialize(<ApiResource>doc.data, Post, context);
 

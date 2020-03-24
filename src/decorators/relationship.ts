@@ -4,7 +4,7 @@ import { RelationshipConfiguration } from '../contracts';
 
 export function Relationship(config: RelationshipConfiguration): PropertyDecorator {
     return function (target: any, propertyName: string) {
-        if (!(Reflect as any).hasOwnMetadata(METADATA_KEY, config.resource)) {
+        if ((typeof config.resource === 'object') && !(Reflect as any).hasOwnMetadata(METADATA_KEY, config.resource)) {
             throw new Error('Specified resource doesn\'t have JSON API metadata');
         }
 

@@ -1,4 +1,4 @@
-export class SerializationContext {
+export class DeserializationContext {
     private resources: {[key: string]: {[key: string]: any}} = {};
     private linked: {[key: string]: {[key: string]: any}} = {};
 

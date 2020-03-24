@@ -2,6 +2,7 @@ import { METADATA_KEY, METADATA_PROPERTY } from '../decorators/model';
 
 export class ResourceMetadata {
     private _isNew: boolean = true;
+    private _flushed: boolean = false;
     private _fields: {[field: string]: {value: any, initial: any}} = {};
 
     public static getMetadata(resource: {[key: string]: any}): ResourceMetadata {
@@ -49,6 +50,8 @@ export class ResourceMetadata {
             this._fields[field].value = value;
         }
 
+        this._flushed = false;
+
         return this;
     }
 
@@ -75,6 +78,10 @@ export class ResourceMetadata {
     }
 
     flush(isNew: boolean = false, recursive: boolean = true): ResourceMetadata {
+        if (this._flushed) {
+            return this;
+        }
+
         this._isNew = false;
         Object.keys(this._fields).forEach((field) => {
             if (this._fields[field].value instanceof Array) {
@@ -93,6 +100,7 @@ export class ResourceMetadata {
                 });
             }
         });
+        this._flushed = true;
 
         return this;
     }

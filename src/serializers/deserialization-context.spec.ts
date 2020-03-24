@@ -1,12 +1,12 @@
-import { SerializationContext } from './context';
+import { DeserializationContext } from './deserialization-context';
 
 describe('SerializationContext', () => {
     let user: any;
-    let context: SerializationContext;
+    let context: DeserializationContext;
 
     beforeEach(() => {
         user = {type: 'users', id: 'test', name: 'Test User'};
-        context = new SerializationContext([
+        context = new DeserializationContext([
             user,
             {id: 'invalid'},
             {type: 'invalid'}

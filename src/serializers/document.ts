@@ -4,7 +4,8 @@ import { JsonApiResourceSerializer } from './resource';
 import { Resource, ResourceType, ApiDocument, ApiResource } from '../contracts';
 import { ModelMetadata } from '../metadata';
 import { JsonApiDocument } from '../models';
-import { SerializationContext } from './context';
+import { DeserializationContext } from './deserialization-context';
+import { SerializationContext } from './serialization-context';
 
 @Injectable()
 export class JsonApiDocumentSerializer {
@@ -13,15 +14,16 @@ export class JsonApiDocumentSerializer {
 
     serialize<T extends Resource>(resources: T|T[]): ApiDocument {
         const doc: ApiDocument = {};
+        const context = new SerializationContext();
 
         if (Array.isArray(resources)) {
             doc.data = [];
 
             resources.forEach((resource: T) => {
-                (<ApiResource[]>doc.data).push(this.resSerializer.serialize(resource));
+                (<ApiResource[]>doc.data).push(this.resSerializer.serialize(resource,context));
             });
         } else {
-            doc.data = this.resSerializer.serialize(resources);
+            doc.data = this.resSerializer.serialize(resources, context);
         }
 
         return doc;
@@ -57,7 +59,7 @@ export class JsonApiDocumentSerializer {
         }
 
         if (data.data) {
-            const context = new SerializationContext(data.included);
+            const context = new DeserializationContext(data.included);
 
             if (Array.isArray(data.data)) {
                 doc.data = [];
