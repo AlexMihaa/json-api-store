@@ -1,7 +1,12 @@
 {
-  "name": "@orbit/json-api-store",
+  "name": "@orbitsoft/json-api-store",
   "version": "4.2.0",
   "description": "Store that allows you interact with JSON API backend",
+  "homepage": "https://orbitsoft.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OrbitScripts/json-api-store"
+  },
   "scripts": {
     "clean": "rimraf dist coverage",
     "build": "ngc -p config/tsconfig.build.json",
@@ -14,11 +19,7 @@
   "contributors": [
     "Sergey Revenko <sergey.revenko@orbitsoft.com>"
   ],
-  "license": "UNLICENSED",
-  "publishConfig": {
-    "registry": "http://npm.orbita1.ru:4873",
-    "access": "restricted"
-  },
+  "license": "MIT",
   "peerDependencies": {
     "@angular/core": "^6.1.4",
     "@angular/http": "^6.1.4"
