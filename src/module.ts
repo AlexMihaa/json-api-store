@@ -16,7 +16,7 @@ import { JsonApiResourceSerializer, JsonApiDocumentSerializer } from './serializ
     ]
 })
 export class JsonApiModule {
-    public static forRoot(apiUrl: string): ModuleWithProviders {
+    public static forRoot(apiUrl: string): ModuleWithProviders<JsonApiModule> {
         return {
             ngModule: JsonApiModule,
             providers: [
