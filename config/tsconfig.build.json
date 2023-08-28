@@ -9,8 +9,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "declaration": true,
-    "outDir": "../dist",
-    "baseUrl": "src"
+    "outDir": "../dist"
   },
   "files": [
     "../src/index.ts"

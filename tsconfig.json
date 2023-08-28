@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "module": "ES2015",
+    "module": "commonjs",
     "target": "es5",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -9,7 +9,6 @@
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "outDir": "./build",
-    "baseUrl": "src",
     "types": [
       "jasmine",
       "node",
