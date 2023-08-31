@@ -1,6 +1,6 @@
 {
   "name": "@orbitsoft/json-api-store",
-  "version": "4.3.0",
+  "version": "5.0.0",
   "description": "Store that allows you interact with JSON API backend",
   "homepage": "https://orbitsoft.com/",
   "repository": {
