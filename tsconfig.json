@@ -2,24 +2,20 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2015",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "declaration": false,
     "moduleResolution": "node",
     "noUnusedLocals": true,
+    "sourceMap": true,
     "outDir": "./build",
     "types": [
       "jasmine",
       "node",
       "reflect-metadata"
     ],
-    "lib": [
-      "es2015",
-      "es6",
-      "es7",
-      "dom"
-    ]
+    "lib": ["es2018", "dom"]
   },
   "files": [
     "./src/index.ts"
