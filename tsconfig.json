@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
+    "outDir": "./build",
     "noImplicitAny": true,
     "module": "commonjs",
-    "target": "es2015",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "declaration": false,
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "sourceMap": true,
-    "outDir": "./build",
+    "target": "ES2022",
     "types": [
       "jasmine",
       "node",
       "reflect-metadata"
     ],
-    "lib": ["es2018", "dom"]
+    "lib": ["ES2022", "dom"]
   },
   "files": [
     "./src/index.ts"
