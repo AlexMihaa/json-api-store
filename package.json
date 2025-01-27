@@ -21,12 +21,12 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@angular/common": "^17.3.12",
-    "@angular/compiler": "^17.3.12",
-    "@angular/compiler-cli": "^17.3.12",
-    "@angular/core": "^17.3.12",
-    "@angular/platform-browser": "^17.3.12",
-    "@angular/platform-browser-dynamic": "^17.3.12",
+    "@angular/common": "^18.2.13",
+    "@angular/compiler": "^18.2.13",
+    "@angular/compiler-cli": "^18.2.13",
+    "@angular/core": "^18.2.13",
+    "@angular/platform-browser": "^18.2.13",
+    "@angular/platform-browser-dynamic": "^18.2.13",
     "@types/jasmine": "^2.5.46",
     "@types/node": "^7.0.8",
     "awesome-typescript-loader": "^3.1.2",
@@ -55,6 +55,6 @@
     "zone.js": "^0.14.10"
   },
   "dependencies": {
-    "@angular/cli": "^17.3.11"
+    "@angular/cli": "^18.2.12"
   }
 }
