@@ -71,12 +71,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('GET');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('GET');
             });
@@ -121,12 +121,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('GET');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('GET');
             });
@@ -173,12 +173,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('GET');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('GET');
             });
@@ -226,12 +226,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('GET');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('GET');
             });
@@ -273,12 +273,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('POST');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('POST');
             });
@@ -322,12 +322,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('POST');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('POST');
             });
@@ -371,12 +371,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('PATCH');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('PATCH');
             });
@@ -421,12 +421,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('PATCH');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('PATCH');
             });
@@ -469,12 +469,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('PATCH');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('PATCH');
             });
@@ -518,12 +518,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('PATCH');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('PATCH');
             });
@@ -562,12 +562,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('DELETE');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('DELETE');
             });
@@ -606,12 +606,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('DELETE');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('DELETE');
             });
@@ -649,12 +649,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('DELETE');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('DELETE');
             });
@@ -693,12 +693,12 @@ describe("Services", () => {
                 expect(rReqInterceptor).toHaveBeenCalledTimes(1);
 
                 expect(gRespInterceptor).toHaveBeenCalledTimes(1);
-                const gRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const gRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(gRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(gRespInterceptorArgs[1]).toEqual('DELETE');
 
                 expect(rRespInterceptor).toHaveBeenCalledTimes(1);
-                const rRespInterceptorArgs = (<any>rRespInterceptor).calls.mostRecent().args;
+                const rRespInterceptorArgs = (rRespInterceptor as any).calls.mostRecent().args;
                 expect(rRespInterceptorArgs[0] instanceof HttpResponse).toBeTruthy();
                 expect(rRespInterceptorArgs[1]).toEqual('DELETE');
             });

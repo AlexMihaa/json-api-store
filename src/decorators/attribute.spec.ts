@@ -40,7 +40,7 @@ describe('Decorators', () => {
         it('should remove original property', () => {
             const instance = new TestResource();
 
-            expect(instance.hasOwnProperty('name')).toBeFalsy();
+            expect(Object.prototype.hasOwnProperty.call(instance, 'name')).toBeFalsy();
         });
 
         it('should provide getter and setter for original property', () => {

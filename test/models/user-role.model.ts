@@ -9,7 +9,7 @@ export class UserRole extends JsonApiResource {
     role: string;
 
     @Attribute()
-    status: string = 'activation';
+    status = 'activation';
 
     constructor(user?: User, role?: string) {
         super();

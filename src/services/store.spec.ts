@@ -57,7 +57,7 @@ describe('Services', () => {
             store.get(resType, userId, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                const call = (<any>serializer.deserialize).calls.mostRecent();
+                const call = (serializer.deserialize as any).calls.mostRecent();
 
                 expect(call.args[0]).toEqual(response);
                 expect(call.args[1]).toEqual(resType);
@@ -91,7 +91,7 @@ describe('Services', () => {
             store.getList(resType, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                const call = (<any>serializer.deserialize).calls.mostRecent();
+                const call = (serializer.deserialize as any).calls.mostRecent();
 
                 expect(call.args[0]).toEqual(response);
                 expect(call.args[1]).toEqual(resType);
@@ -114,7 +114,7 @@ describe('Services', () => {
             adapter.create.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
-                const serializerCall = (<any>serializer.serialize).calls.mostRecent();
+                const serializerCall = (serializer.serialize as any).calls.mostRecent();
                 expect(serializerCall.args[0]).toEqual(user);
 
                 expect(type).toEqual(User);
@@ -130,7 +130,7 @@ describe('Services', () => {
             store.save(user, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                const call = (<any>serializer.deserialize).calls.mostRecent();
+                const call = (serializer.deserialize as any).calls.mostRecent();
 
                 expect(call.args[0]).toEqual(response);
                 expect(call.args[1]).toEqual(User);
@@ -158,7 +158,7 @@ describe('Services', () => {
             adapter.create.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
-                const serializerCall = (<any>serializer.serialize).calls.mostRecent();
+                const serializerCall = (serializer.serialize as any).calls.mostRecent();
                 expect(serializerCall.args[0]).toEqual(newUsers);
 
                 expect(type).toEqual(User);
@@ -174,7 +174,7 @@ describe('Services', () => {
                 (doc: any) => {
                     expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                    const call = (<any>serializer.deserialize).calls.mostRecent();
+                    const call = (serializer.deserialize as any).calls.mostRecent();
 
                     expect(call.args[0]).toEqual(response);
                     expect(call.args[1]).toEqual(User);
@@ -205,7 +205,7 @@ describe('Services', () => {
             adapter.update.and.callFake((type: any, id: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
-                const serializeCall = (<any>serializer.serialize).calls.mostRecent();
+                const serializeCall = (serializer.serialize as any).calls.mostRecent();
                 expect(serializeCall.args[0]).toEqual(user);
 
                 expect(type).toEqual(User);
@@ -222,7 +222,7 @@ describe('Services', () => {
             store.save(user, params, options).subscribe((doc: any) => {
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                const call = (<any>serializer.deserialize).calls.mostRecent();
+                const call = (serializer.deserialize as any).calls.mostRecent();
 
                 expect(call.args[0]).toEqual(response);
                 expect(call.args[1]).toEqual(User);
@@ -256,7 +256,7 @@ describe('Services', () => {
             adapter.updateAll.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serialize).toHaveBeenCalledTimes(1);
 
-                const serializerCall = (<any>serializer.serialize).calls.mostRecent();
+                const serializerCall = (serializer.serialize as any).calls.mostRecent();
                 expect(serializerCall.args[0]).toEqual(users);
 
                 expect(type).toEqual(User);
@@ -273,7 +273,7 @@ describe('Services', () => {
                 expect(adapter.updateAll).toHaveBeenCalledTimes(1);
                 expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                const call = (<any>serializer.deserialize).calls.mostRecent();
+                const call = (serializer.deserialize as any).calls.mostRecent();
 
                 expect(call.args[0]).toEqual(response);
                 expect(call.args[1]).toEqual(User);
@@ -324,7 +324,7 @@ describe('Services', () => {
             adapter.removeAll.and.callFake((type: any, payload: any, reqParams: any, opts: Options) => {
                 expect(serializer.serializeAsId).toHaveBeenCalledTimes(1);
 
-                const serializerCall = (<any>serializer.serializeAsId).calls.mostRecent();
+                const serializerCall = (serializer.serializeAsId as any).calls.mostRecent();
                 expect(serializerCall.args[0]).toEqual(users);
 
                 expect(type).toEqual(User);
@@ -362,7 +362,7 @@ describe('Services', () => {
                     expect(adapter.get).toHaveBeenCalledTimes(1);
                     expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                    const call = (<any>serializer.deserialize).calls.mostRecent();
+                    const call = (serializer.deserialize as any).calls.mostRecent();
 
                     expect(call.args[0]).toEqual(response);
                     expect(call.args[1]).toEqual(User);
@@ -397,7 +397,7 @@ describe('Services', () => {
                 (error: any) => {
                     expect(serializer.deserialize).toHaveBeenCalledTimes(1);
 
-                    const call = (<any>serializer.deserialize).calls.mostRecent();
+                    const call = (serializer.deserialize as any).calls.mostRecent();
 
                     expect(error).toEqual(call.returnValue);
                     expect(error instanceof JsonApiDocument).toBeTruthy();

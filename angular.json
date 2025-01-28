@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "JSON-test": {
+    "JSONtest": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -12,11 +12,23 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }

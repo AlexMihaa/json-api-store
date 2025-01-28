@@ -95,7 +95,7 @@ describe('JsonApiDocumentSerializer', () => {
         spyOn(resSerializer, 'deserialize').and.callFake((item: any, resType: any, context: any) => {
             pass++;
 
-            const responseData: ApiResource[] = <ApiResource[]>data.data;
+            const responseData: ApiResource[] = data.data as ApiResource[];
             const expectedItem: ApiResource = (1 === pass) ? responseData[0] : responseData[1];
             expect(item).toEqual(expectedItem);
 
@@ -111,7 +111,7 @@ describe('JsonApiDocumentSerializer', () => {
 
         expect(doc instanceof JsonApiDocument).toBeTruthy();
 
-        const docData: User[] = <User[]>doc.data;
+        const docData: User[] = doc.data as User[];
         expect(Array.isArray(docData)).toBeTruthy();
         expect(docData[0]).toEqual(user1);
         expect(docData[1]).toEqual(user2);
@@ -126,7 +126,7 @@ describe('JsonApiDocumentSerializer', () => {
 
         expect(doc instanceof JsonApiDocument).toBeTruthy();
 
-        const docData: any[] = <Shape[]>doc.data;
+        const docData: any[] = doc.data as Shape[];
         expect(Array.isArray(docData)).toBeTruthy();
         expect(docData.length).toEqual(2);
 
@@ -150,7 +150,7 @@ describe('JsonApiDocumentSerializer', () => {
 
         const doc = docSerializer.deserialize(data, User);
 
-        expect((<any>resSerializer.deserialize).calls.count()).toEqual(0);
+        expect((resSerializer.deserialize as any).calls.count()).toEqual(0);
         expect(doc instanceof JsonApiDocument).toBeTruthy();
         expect(doc.errors).toEqual(data.errors);
     });

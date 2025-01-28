@@ -181,7 +181,7 @@ describe('JsonApiResourceSerializer', () => {
         const doc: ApiDocument = require('../../test/documents/user.json');
         const context = new DeserializationContext(doc.included);
 
-        const parsed = serializer.deserialize(<ApiResource>doc.data, User, context);
+        const parsed = serializer.deserialize((doc.data as ApiResource), User, context);
 
         expect(parsed instanceof User).toBeTruthy();
         expect(parsed.id).toEqual("1");
@@ -210,7 +210,7 @@ describe('JsonApiResourceSerializer', () => {
         const doc: ApiDocument = require('../../test/documents/user-sparse-fieldset.json');
         const context = new DeserializationContext(doc.included);
 
-        const parsed = serializer.deserialize(<ApiResource>doc.data, User, context);
+        const parsed = serializer.deserialize((doc.data as ApiResource), User, context);
 
         expect(parsed instanceof User).toBeTruthy();
         expect(parsed.id).toEqual("1");
@@ -231,7 +231,7 @@ describe('JsonApiResourceSerializer', () => {
         const doc: ApiDocument = require('../../test/documents/custom-fields.json');
         const context = new DeserializationContext(doc.included);
 
-        const parsed = serializer.deserialize(<ApiResource>doc.data, CustomFieldsResource, context);
+        const parsed = serializer.deserialize((doc.data as ApiResource), CustomFieldsResource, context);
 
         expect(parsed instanceof CustomFieldsResource).toBeTruthy();
         expect(parsed.id).toEqual('test');
@@ -249,7 +249,7 @@ describe('JsonApiResourceSerializer', () => {
         const doc: ApiDocument = require('../../test/documents/custom-attribute.json');
         const context = new DeserializationContext(doc.included);
 
-        const parsed = serializer.deserialize(<ApiResource>doc.data, CustomAttributeResource, context);
+        const parsed = serializer.deserialize((doc.data as ApiResource), CustomAttributeResource, context);
 
         expect(attrSerializer.deserialize).toHaveBeenCalledWith('test');
 
@@ -262,7 +262,7 @@ describe('JsonApiResourceSerializer', () => {
         const doc: ApiDocument = require('../../test/documents/corrupted.json');
         const context = new DeserializationContext(doc.included);
 
-        const parsed = serializer.deserialize(<ApiResource>doc.data, CorruptedResource, context);
+        const parsed = serializer.deserialize((doc.data as ApiResource), CorruptedResource, context);
 
         expect(parsed instanceof CorruptedResource).toBeTruthy();
         expect(parsed.id).toEqual('test');
@@ -276,7 +276,7 @@ describe('JsonApiResourceSerializer', () => {
         const doc: ApiDocument = require('../../test/documents/post.json');
         const context = new DeserializationContext(doc.included);
 
-        const parsed = serializer.deserialize(<ApiResource>doc.data, Post, context);
+        const parsed = serializer.deserialize((doc.data as ApiResource), Post, context);
 
         expect(parsed instanceof Post).toBeTruthy();
         expect(parsed.author instanceof User).toBeTruthy();

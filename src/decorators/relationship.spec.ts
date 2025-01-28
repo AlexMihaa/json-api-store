@@ -50,8 +50,8 @@ describe('Decorators', () => {
         it('should remove original property', () => {
             const menu = new Menu();
 
-            expect(menu.hasOwnProperty('creator')).toBeFalsy();
-            expect(menu.hasOwnProperty('items')).toBeFalsy();
+            expect(Object.prototype.hasOwnProperty.call(menu, 'creator')).toBeFalsy();
+            expect(Object.prototype.hasOwnProperty.call(menu, 'items')).toBeFalsy();
         });
 
         it('should provide getter and setter for original property', () => {
