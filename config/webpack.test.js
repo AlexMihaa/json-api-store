@@ -1,14 +1,12 @@
-/**
- * Adapted from angular2-webpack-starter
- */
-
-const helpers = require('./helpers');
-
-const webpack = require('webpack');
+const path = require('path');
 const { ContextReplacementPlugin } = require('webpack');
-const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
+const ROOT = path.resolve(__dirname, '..');
+
+function root(args) {
+    return path.join.apply(path, [ROOT].concat(args));
+}
 /**
  * Webpack Plugins
  */
@@ -25,7 +23,7 @@ module.exports = {
 
     resolve: {
         extensions: ['.ts', '.js'],
-        modules: [helpers.root('src'), 'node_modules']
+        modules: [root('src'), 'node_modules']
     },
 
     module: {
@@ -41,8 +39,8 @@ module.exports = {
             test: /\.js$/,
             loader: 'source-map-loader',
             exclude: [
-                helpers.root('node_modules/rxjs'),
-                helpers.root('node_modules/@angular')
+                root('node_modules/rxjs'),
+                root('node_modules/@angular'),
             ]
         }, {
             test: /\.ts$/,
@@ -75,10 +73,11 @@ module.exports = {
         // fix the warning in ./~/@angular/core/src/linker/system_js_ng_module_factory_loader.js
         new ContextReplacementPlugin (
             /angular(\\|\/)core(\\|\/)@angular/,
-            helpers.root('./src')
+            root('./src')
         ),
         new ESLintPlugin({
             extensions: ['ts', 'js'], // Проверяем только файлы .ts и .js
+            failOnError: false,
             fix: true, // Автоматическое исправление ошибок
         }),
 

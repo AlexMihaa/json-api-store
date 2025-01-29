@@ -22,19 +22,28 @@ module.exports = function(config) {
         webpack: testWebpackConfig,
 
         coverageReporter: {
-            type: 'in-memory'
+            type: 'in-memory',
+            dir: './coverage',
+            reporters: [
+                { type: 'html', subdir: 'html' },
+                { type: 'json', subdir: '.', file: 'coverage.json' },
+                { type: 'text-summary' }
+            ]
         },
 
-        remapCoverageReporter: {
-            'text-summary': null,
-            json: './coverage/coverage.json',
-            html: './coverage/html'
-        },
+        // remapCoverageReporter: {
+        //     'text-summary': null,
+        //     json: './coverage/coverage.json',
+        //     html: './coverage/html'
+        // },
 
         // Webpack please don't spam the console when running in karma!
-        webpackMiddleware: { stats: 'errors-only'},
+        webpackMiddleware: {
+            stats: 'minimal',
+            logLevel: 'warn'
+        },
 
-        reporters: [ 'mocha', 'coverage', 'remap-coverage' ],
+        reporters: [ 'mocha', 'coverage' ],
 
         mochaReporter: {
             ignoreSkipped: true
@@ -58,9 +67,9 @@ module.exports = function(config) {
         ],
 
         customLaunchers: {
-            ChromeTravisCi: {
-                base: 'Chrome',
-                flags: ['--no-sandbox']
+            ChromeHeadlessCustom: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
             }
         },
 

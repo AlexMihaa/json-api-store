@@ -2,12 +2,20 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 
-function root(args) {
-    args = Array.prototype.slice.call(arguments, 0);
-
-    return path.join.apply(path, [ROOT].concat(args));
+function root(...args) {
+    return path.join(ROOT, ...args);
 }
 
-exports.root = root;
-exports.hasProcessFlag = (flag) => process.argv.join('').indexOf(flag) > -1;
-exports.isWebpackDevServer = () => process.argv[1] && !! (/webpack-dev-server$/.exec(process.argv[1]));
+function hasProcessFlag(flag) {
+    return process.argv.join('').includes(flag);
+}
+
+function isWebpackDevServer() {
+    return process.argv[1] && /webpack-dev-server$/.test(process.argv[1]);
+}
+
+module.exports = {
+    root,
+    hasProcessFlag,
+    isWebpackDevServer,
+};
