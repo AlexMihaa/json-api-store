@@ -79,6 +79,7 @@ module.exports = {
             extensions: ['ts', 'js'], // Проверяем только файлы .ts и .js
             failOnError: false,
             fix: true, // Автоматическое исправление ошибок
+            context: root('.')
         }),
 
         // new LoaderOptionsPlugin({

@@ -6,18 +6,18 @@ import { User } from './user.model';
 export class UserRole extends JsonApiResource {
 
     @Attribute()
-    role: string;
+      role: string;
 
     @Attribute()
-    status = 'activation';
+      status = 'activation';
 
     constructor(user?: User, role?: string) {
-        super();
+      super();
 
-        this.role = role;
+      this.role = role;
 
-        if (user && user.id && role) {
-            this.id = user.id + '-' + role;
-        }
+      if (user && user.id && role) {
+        this.id = user.id + '-' + role;
+      }
     }
 }
