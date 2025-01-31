@@ -77,6 +77,7 @@ export class ResourceMetadata {
     return true;
   }
 
+  // @ts-ignore
   flush(isNew = false, recursive = true): ResourceMetadata {
     if (this._flushed) {
       return this;

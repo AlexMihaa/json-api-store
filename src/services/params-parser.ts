@@ -12,7 +12,7 @@ export class JsonApiParamsParser {
 
   private serializeData(data: any, params: HttpParams, prefix = ''): HttpParams {
     for (const property in data) {
-      if (!data.hasOwnProperty(property)) {
+      if (!Object.prototype.hasOwnProperty.call(data, property)) {
         continue;
       }
 

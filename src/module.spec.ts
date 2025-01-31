@@ -1,17 +1,19 @@
-import { HttpClientModule } from "@angular/common/http";
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { JsonApiModule } from './module';
-import { JsonApiStore, JsonApiUrlBuilder, JsonApiParamsParser, JsonApiStoreAdapter } from './services';
-import { JsonApiResourceSerializer, JsonApiDocumentSerializer } from './serializers';
+import {JsonApiModule} from './module';
+import {JsonApiParamsParser, JsonApiStore, JsonApiStoreAdapter, JsonApiUrlBuilder} from './services';
+import {JsonApiDocumentSerializer, JsonApiResourceSerializer} from './serializers';
+import {provideHttpClientTesting} from "@angular/common/http/testing";
 
 describe('JsonApiModule', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientModule,
         JsonApiModule.forRoot('http://api.org/v1')
+      ],
+      providers: [
+        provideHttpClientTesting()
       ]
     });
   });

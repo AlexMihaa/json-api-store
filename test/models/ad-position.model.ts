@@ -20,5 +20,6 @@ export class AdPosition extends JsonApiResource {
       status: string;
 
     @Relationship({resource: 'com.test.AdSet'})
+    // @ts-ignore
       adSet: AdPositionSet;
 }

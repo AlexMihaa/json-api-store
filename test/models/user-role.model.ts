@@ -1,6 +1,6 @@
 import { JsonApiResource, Model, Attribute } from '../../src';
 
-import { User } from './user.model';
+import type { User } from './user.model';
 
 @Model({type: 'user-roles'})
 export class UserRole extends JsonApiResource {

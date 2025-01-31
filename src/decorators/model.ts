@@ -5,7 +5,8 @@ export const METADATA_KEY = 'JsonApiResource';
 export const METADATA_PROPERTY = '__apiMetadata';
 
 export function Model(config?: ModelConfiguration): ClassDecorator {
-   
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   return function (target: Function) {
     if (!(Reflect as any).hasOwnMetadata(METADATA_KEY, target)) {
       (Reflect as any).defineMetadata(METADATA_KEY, new ModelMetadata(), target);

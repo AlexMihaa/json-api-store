@@ -1,12 +1,28 @@
-const tseslint = require("@typescript-eslint/eslint-plugin");
-const angular = require("@angular-eslint/eslint-plugin");
 const tsParser = require("@typescript-eslint/parser");
-const js = require("@eslint/js");
+const eslint = require('@eslint/js');
+const tseslint = require('typescript-eslint');
+const angular = require('angular-eslint');
 
-module.exports = [
+const ignores = [
+    'dist/',
+    'out-tsc/',
+    'node_modules/',
+    '.idea/',
+    '.vscode/',
+    '.history/',
+    '.angular/',
+    'coverage/',
+    'coverage-ts/',
+    'package-lock.json',
+    '.cache',
+];
+
+module.exports = tseslint.config(
+    {
+        ignores,
+    },
     {
         files: ["**/*.ts"],
-        ignores: ["node_modules/**"],
         languageOptions: {
             globals: {
                 window: true,
@@ -25,10 +41,13 @@ module.exports = [
                 ecmaVersion: 2022,
             },
         },
-        plugins: {
-            "@typescript-eslint": tseslint,
-            "@angular-eslint": angular,
-        },
+        processor: angular.processInlineTemplates,
+        extends: [
+            eslint.configs.recommended,
+            ...tseslint.configs.recommended,
+            ...tseslint.configs.stylistic,
+            ...angular.configs.tsRecommended,
+        ],
         rules: {
             curly: "error",
             "no-console": [
@@ -61,6 +80,9 @@ module.exports = [
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-unused-expressions": "error",
             "@typescript-eslint/no-use-before-define": "error",
+            "@typescript-eslint/no-require-imports": "off",
+            "@typescript-eslint/ban-ts-comment": "off",
+            "@typescript-eslint/no-unused-vars": "off"
         },
-    },
-];
+    }
+);

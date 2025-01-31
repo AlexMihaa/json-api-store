@@ -9,11 +9,10 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "declaration": true,
-    "outDir": "../dist",
-//    "useDefineForClassFields": false
+    "outDir": "./dist",
   },
   "files": [
-    "../src/index.ts"
+    "./src/index.ts"
   ],
   "angularCompilerOptions": {
     "skipMetadataEmit": false,

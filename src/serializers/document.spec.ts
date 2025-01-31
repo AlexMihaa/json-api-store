@@ -69,6 +69,7 @@ describe('JsonApiDocumentSerializer', () => {
     const data: ApiDocument = require('../../test/documents/user.json');
     const user = new User();
 
+    // @ts-ignore
     spyOn(resSerializer, 'deserialize').and.callFake((item: any, resType: any, context: any) => {
       expect(item).toEqual(data.data);
       expect(resType).toEqual(User);
@@ -92,6 +93,7 @@ describe('JsonApiDocumentSerializer', () => {
 
     let pass = 0;
 
+    // @ts-ignore
     spyOn(resSerializer, 'deserialize').and.callFake((item: any, resType: any, context: any) => {
       pass++;
 
